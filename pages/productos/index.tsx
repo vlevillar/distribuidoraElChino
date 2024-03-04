@@ -8,7 +8,7 @@ const Productos = () => {
 
   console.log(selected);
 
-  const handleSelectionChange = (key: string) => {
+  const handleSelectionChange = (key: any) => {
     setSelected(key);
   };
 

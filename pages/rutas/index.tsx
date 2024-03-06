@@ -1,7 +1,11 @@
+import RouteTable from "@/components/RouteTable"
+import RouteTabs from "@/components/RouteTabs"
+
 const Rutas = () => {
   return (
     <>
-    <div>Rutas</div>
+    <RouteTabs/>
+    <RouteTable/>
     </>
   )
 }

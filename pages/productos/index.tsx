@@ -1,12 +1,10 @@
 import ProductItem from "@/components/ProductItem";
-import { Button, Tab, Tabs } from "@nextui-org/react";
+import { Tab, Tabs } from "@nextui-org/react";
+import ProductModal from "@/modals/ProductModal";
 import React from "react";
-import { PlusCircle } from 'react-feather';
 
 const Productos = () => {
   const [selected, setSelected] = React.useState("precio1");
-
-  console.log(selected);
 
   const handleSelectionChange = (key: any) => {
     setSelected(key);
@@ -15,9 +13,7 @@ const Productos = () => {
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="pb-4 flex flex-col">
-        <Button startContent={<PlusCircle />} color="success">
-          Agregar Producto
-        </Button>
+        <ProductModal />
         <div>
           <Tabs
             variant='underlined'
@@ -33,10 +29,10 @@ const Productos = () => {
         </div>
       </div>
       <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-3">
-        <ProductItem />
-        <ProductItem />
-        <ProductItem />
-        <ProductItem />
+        <ProductItem price={selected} />
+        <ProductItem price={selected} />
+        <ProductItem price={selected} />
+        <ProductItem price={selected} />
       </div>
     </div>
   );

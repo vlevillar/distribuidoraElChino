@@ -8,7 +8,13 @@ import {
 } from '@nextui-org/react';
 import AccountModal from '@/modals/AccountModal';
 
-const ClientItem = ({ client }) => {
+interface Client {
+  name: string;
+  address: string;
+  phone: string;
+}
+
+const ClientItem: React.FC<{ client: Client }> = ({ client }) => {
   const { name, address, phone } = client;
 
   return (

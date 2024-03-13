@@ -21,10 +21,10 @@ const Productos = () => {
             aria-label="Options"
             selectedKey={selected}
           >
-            <Tab key="precio1" title="Precio 1" />
-            <Tab key="precio2" title="Precio 2" />
-            <Tab key="precio3" title="Precio 3" />
-            <Tab key="precio4" title="Precio 4" />
+            <Tab key="precio1" title="Lista 1" />
+            <Tab key="precio2" title="Lista 2" />
+            <Tab key="precio3" title="Lista 3" />
+            <Tab key="precio4" title="Lista 4" />
           </Tabs>
         </div>
       </div>

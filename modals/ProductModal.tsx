@@ -1,5 +1,5 @@
 import React from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input } from "@nextui-org/react";
 import { PlusCircle, Package, DollarSign, Edit } from 'react-feather';
 
 export default function ProductModal() {
@@ -32,29 +32,12 @@ export default function ProductModal() {
                   variant="bordered"
                   endContent={<Package/>}
                 />
+                <div className="flex gap-4">
+                <Checkbox>Kg</Checkbox>
+                <Checkbox>Unidad</Checkbox>
+                </div>
                 <Input
-                  label="Precio 1"
-                  placeholder="0.00"
-                  type="number"
-                  variant="bordered"
-                  endContent={<DollarSign/>}
-                />
-                <Input
-                  label="Precio 2"
-                  placeholder="0.00"
-                  type="number"
-                  variant="bordered"
-                  endContent={<DollarSign/>}
-                />
-                <Input
-                  label="Precio 3"
-                  placeholder="0.00"
-                  type="number"
-                  variant="bordered"
-                  endContent={<DollarSign/>}
-                />
-                <Input
-                  label="Precio 4"
+                  label="Precio"
                   placeholder="0.00"
                   type="number"
                   variant="bordered"

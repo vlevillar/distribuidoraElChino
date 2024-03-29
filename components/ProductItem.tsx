@@ -14,8 +14,6 @@ export default function ProductItem( { price }: ProductItemProps ) {
             <CardHeader className="flex gap-3 items-center justify-center">
                 <div className="flex flex-col">
                     <p className="text-md">JAMON</p>
-                    <p className="text-small text-default-500">STOCK:12</p>
-                    <p className="text-small text-default-500">CODE:121212</p>
                 </div>
             </CardHeader>
             <Divider />

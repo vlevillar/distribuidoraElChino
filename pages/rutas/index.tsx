@@ -7,7 +7,8 @@ const Rutas = () => {
   const [weekDates, setWeekDates] = useState<WeekDates | null>(null);
   const [selectedDate, setSelectedDate] = useState<WeekDates[0] | null>(null);
 
-  console.log(selectedDate);
+console.log(weekDates);
+
 
   const updateWeekDates = (weekDates: WeekDates) => {
     setWeekDates(weekDates);
@@ -25,7 +26,7 @@ const Rutas = () => {
           }}
         >
           {weekDates &&
-            Object.entries(weekDates).map(([day, date]) => (
+            Object.entries(weekDates).map(([day]) => (
               <Tab key={day} title={day} />
             ))}
         </Tabs>

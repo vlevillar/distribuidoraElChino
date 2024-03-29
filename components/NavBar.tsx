@@ -14,7 +14,8 @@ import {
 } from '@nextui-org/react'
 import ThemeSwitcher from './ThemeSwitcher'
 import { usePathname } from 'next/navigation'
-import { Home, Users, ShoppingBag, Edit, GitPullRequest } from 'react-feather'
+import { Home, Users, ShoppingBag, Edit, GitPullRequest, Percent } from 'react-feather'
+import PercentList from './PercentList'
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
@@ -78,18 +79,11 @@ export default function NavBar() {
       </NavbarContent>
 
       <NavbarContent justify='end'>
-        <div className='gap-2 hidden sm:flex'>
         <NavbarItem>
-          <Button as={Link} color='success' href='#' variant='flat'>
-            Iniciar Sesion
+          <Button>
+            <PercentList/>
           </Button>
         </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color='warning' href='#' variant='flat'>
-            Registrarse
-          </Button>
-        </NavbarItem>
-        </div>
         <NavbarItem>
           <ThemeSwitcher />
         </NavbarItem>

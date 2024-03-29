@@ -12,10 +12,11 @@ interface Client {
   name: string;
   address: string;
   phone: string;
+  type: string;
 }
 
 const ClientItem: React.FC<{ client: Client }> = ({ client }) => {
-  const { name, address, phone } = client;
+  const { name, address, phone, type } = client;
 
   return (
     <Card className='max-w-[300px]'>
@@ -24,6 +25,7 @@ const ClientItem: React.FC<{ client: Client }> = ({ client }) => {
           <p className='text-md'>{name}</p>
           <p className='text-small text-default-500'>Telefono: {phone}</p>
           <p className='text-small text-default-500'>Dirección: {address}</p>
+          <p className='text-small text-default-500'>Tipo: {type}</p>
         </div>
       </CardHeader>
       <Divider />

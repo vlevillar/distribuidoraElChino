@@ -9,14 +9,17 @@ import {
   useDisclosure,
   Input,
 } from "@nextui-org/react";
-import { PlusCircle, Edit, Map, Smartphone, Briefcase } from "react-feather";
+import { PlusCircle, Edit, Map, Smartphone } from "react-feather";
 
-export default function ClientModal() {
+interface Props {
+  currentDate: string | null;
+}
+
+const RouteModal: React.FC<Props> = ({ currentDate }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nombre, setNombre] = useState("");
   const [direccion, setDireccion] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [tipo, setTipo] = useState("");
 
   const crearCliente = async () => {
     try {
@@ -29,8 +32,7 @@ export default function ClientModal() {
         body: JSON.stringify({
           name: nombre,
           address: direccion,
-          phone: telefono,
-          type: tipo,
+          phone: telefono
         }),
       });
       if (response.ok) {
@@ -46,7 +48,7 @@ export default function ClientModal() {
 
   return (
     <>
-      <Button onPress={onOpen} color="success" startContent={<PlusCircle />}>
+      <Button onPress={onOpen} color="primary" startContent={<PlusCircle />}>
         Agregar Cliente
       </Button>
       <Modal isOpen={isOpen} onClose={onClose} placement="top-center">
@@ -80,14 +82,6 @@ export default function ClientModal() {
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
             />
-            <Input
-              label="Tipo de negocio"
-              placeholder="Kiosco, despensa, etc..."
-              variant="bordered"
-              endContent={<Briefcase/>}
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
-            />
           </ModalBody>
           <ModalFooter>
             <Button color="danger" variant="flat" onPress={onClose}>
@@ -102,3 +96,5 @@ export default function ClientModal() {
     </>
   );
 }
+
+export default RouteModal;

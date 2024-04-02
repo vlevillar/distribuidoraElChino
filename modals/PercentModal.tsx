@@ -15,14 +15,13 @@ import {
   Percent
 } from 'react-feather'
 
-export default function PercentModal( { lastNumber }: { lastNumber: number } ) {
+export default function PercentModal( { lastNumber, onSuccess}: { lastNumber: number, onSuccess:Function } ) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
   const [percent, setPercent] = useState(0)
 
-  useEffect(() => {
-  }, [percent]); 
-
-console.log(percent);
+  const handlePost = function(){
+    
+  }
 
   const createPercent = async () => {
     try {

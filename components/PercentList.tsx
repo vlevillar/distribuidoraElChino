@@ -48,7 +48,7 @@ export default function PercentList() {
       </DropdownTrigger>
       <DropdownMenu aria-label='Static Actions' bottomContent={
       //@ts-ignore
-      <PercentModal lastNumber={lastNumberPlusOne} />}>
+      <PercentModal lastNumber={lastNumberPlusOne} onSuccess={getData}/>}>
         {percent.map((e, index) => (
           <DropdownItem key={index}>
             <div className='flex justify-around'>

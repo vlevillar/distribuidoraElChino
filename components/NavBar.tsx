@@ -1,5 +1,4 @@
 'use client'
-
 import React from 'react'
 import {
   Navbar,
@@ -80,9 +79,7 @@ export default function NavBar() {
 
       <NavbarContent justify='end'>
         <NavbarItem>
-          <Button>
             <PercentList/>
-          </Button>
         </NavbarItem>
         <NavbarItem>
           <ThemeSwitcher />
@@ -120,18 +117,6 @@ export default function NavBar() {
             Productos
           </Link>
         </NavbarMenuItem>
-        <div className='flex gap-2 justify-center'>
-        <NavbarMenuItem>
-          <Button as={Link} color='success' href='#' variant='flat'>
-            Iniciar Sesion
-          </Button>
-        </NavbarMenuItem>
-        <NavbarMenuItem>
-          <Button as={Link} color='warning' href='#' variant='flat'>
-            Registrarse
-          </Button>
-        </NavbarMenuItem>
-        </div>
       </NavbarMenu>
     </Navbar>
   )

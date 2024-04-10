@@ -30,7 +30,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
 
   const getData = async () => {
     try {
-      const dateFormatted = formatDate(date); // Formatear la fecha actual
+      const dateFormatted = formatDate(date);
       const response = await fetch(`https://distributor-api.onrender.com/routes?startDate=${dateFormatted}&endDate=${dateFormatted}`, {
         method: "GET",
       });

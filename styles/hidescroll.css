@@ -1,0 +1,12 @@
+.scroll-container::-webkit-scrollbar {
+    width: 0;
+  }
+  
+  .scroll-container::-webkit-scrollbar-track {
+    display: none;
+  }
+  
+  .scroll-container::-webkit-scrollbar-thumb {
+    display: none;
+  }
+  

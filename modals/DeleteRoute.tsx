@@ -1,27 +1,27 @@
 import React from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";
-import { PlusCircle } from 'react-feather';
-import SearchClientCard from "@/components/SearchClientCard";
-import SearchProductCard from "@/components/SearchProductCard";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { Trash2 } from 'react-feather';
 
-export default function OrderModal() {
+interface Props {
+    currentDate: string | null
+}
+
+const DelRoute: React.FC<Props> = ({ currentDate }) => {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
   return (
     <>
-      <Button onPress={onOpen} color="success" startContent={<PlusCircle/>}>Agregar pedido</Button>
+      <Button onPress={onOpen} color="danger" startContent={<Trash2/>}>Borrar Ruta</Button>
       <Modal 
         isOpen={isOpen} 
         onOpenChange={onOpenChange}
-        placement="top-center"
+        placement="center"
       >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Agregar pedido</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Eliminar ruta del: {currentDate}?</ModalHeader>
               <ModalBody>
-              <SearchClientCard/>
-              <SearchProductCard/>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>
@@ -38,3 +38,5 @@ export default function OrderModal() {
     </>
   );
 }
+
+export default DelRoute

@@ -11,11 +11,7 @@ interface Props {
 const Calendario: React.FC<Props> = ({ updateWeekDates }) => {
   const [startDate, setStartDate] = useState<Date>(new Date())
   const [startOfWeek, setStartOfWeek] = useState<Date | null>(null)
-
-  console.log('start:', startDate)
-  console.log('end:', startOfWeek)
-  console.log('test:', new Date(startDate))
-
+  
   useEffect(() => {
     const currentDate = new Date(startDate)
     const start = new Date(

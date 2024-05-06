@@ -13,6 +13,7 @@ import SearchClient from '@/components/SearchClient'
 
 interface Props {
   currentDate: string | null
+  onAddRoute: () => void; 
 }
 interface Client {
   id: number
@@ -22,7 +23,7 @@ interface Client {
   phone: string
 }
 
-const RouteModal: React.FC<Props> = ({ currentDate }) => {
+const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedClients, setSelectedClients] = useState<Client[]>([])  
  
@@ -52,6 +53,7 @@ const RouteModal: React.FC<Props> = ({ currentDate }) => {
       if (response.ok) {
         console.log('Cliente creado exitosamente')
         onClose()
+        onAddRoute()
       } else {
         console.error('Error al crear cliente')
       }

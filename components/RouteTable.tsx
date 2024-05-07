@@ -98,9 +98,6 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
     getData();
   };
 
-  console.log(routes);
-  
-
   return (
     <Table
       topContent={

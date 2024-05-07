@@ -1,14 +1,42 @@
 import ProductItem from "@/components/ProductItem";
 import { Tab, Tabs } from "@nextui-org/react";
 import ProductModal from "@/modals/ProductModal";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Productos = () => {
   const [selected, setSelected] = React.useState("precio1");
+  const [percent, setPercent] = useState<any[]>([])
+
+  useEffect(() => {
+    getData()
+  }, [])
+
+  const getData = async () => {
+    try {
+      const response = await fetch(
+        `https://distributor-api.onrender.com/pricesList`,
+        {
+          method: 'GET'
+        }
+      )
+      if (response.ok) {
+        console.log('Datos obtenidos exitosamente')
+        const data = await response.json()
+        setPercent(data)
+      } else {
+        console.error('Error al obtener datos')
+      }
+    } catch (error) {
+      console.error('Error al obtener datos:', error)
+    }
+  }
 
   const handleSelectionChange = (key: any) => {
     setSelected(key);
   };
+
+  console.log(percent);
+  
 
   return (
     <div className="flex items-center justify-center flex-col">

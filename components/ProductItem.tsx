@@ -5,15 +5,16 @@ import { Edit, Trash } from 'react-feather'
 
 interface ProductItemProps {
     price: string; // Especifica el tipo de la propiedad 'price'
+    name: string;
   }
 
-export default function ProductItem( { price }: ProductItemProps ) {
+export default function ProductItem( { price, name }: ProductItemProps ) {
 
     return (
         <Card className="max-w-[300px]">
             <CardHeader className="flex gap-3 items-center justify-center">
                 <div className="flex flex-col">
-                    <p className="text-md">JAMON</p>
+                    <p className="text-md">{name}</p>
                 </div>
             </CardHeader>
             <Divider />

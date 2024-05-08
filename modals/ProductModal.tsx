@@ -12,7 +12,7 @@ import {
 } from '@nextui-org/react'
 import { PlusCircle, DollarSign, Edit } from 'react-feather'
 
-export default function ProductModal() {
+export default function ProductModal( { onProductCreated } : { onProductCreated: () => void})  {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
@@ -30,6 +30,11 @@ export default function ProductModal() {
     }
   }
 
+  const restartMeasurement = () => {
+    setIsKilogramChecked(false);
+    setIsUnitChecked(false);
+  }
+
   const createProduct = async () => {
     try {
       const response = await fetch(
@@ -43,13 +48,16 @@ export default function ProductModal() {
             name: name,
             code: code,
             measurement: determineMeasurement(),
-            price: price
+            price: parseFloat(price)
           })
         }
       )
       if (response.ok) {
         console.log('Producto creado exitosamente')
         onClose()
+        onProductCreated()
+        setIsKilogramChecked(false)
+        setIsUnitChecked(false)
       } else {
         console.error('Error al crear Producto')
       }
@@ -63,7 +71,7 @@ export default function ProductModal() {
       <Button onClick={onOpen} color='success' startContent={<PlusCircle />}>
         Agregar Producto
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose} placement='top-center'>
+      <Modal isOpen={isOpen} onClose={() => { onClose(); restartMeasurement(); }} placement='center'>
         <ModalContent>
           <ModalHeader className='flex flex-col gap-1'>
             Agregar producto

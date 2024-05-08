@@ -15,13 +15,13 @@ import {
   Percent
 } from 'react-feather'
 
-export default function PercentModal( { lastNumber, onSuccess}: { lastNumber: number, onSuccess:Function } ) {
+export default function PercentModal( { lastNumber, onSuccess }: { lastNumber: number, onSuccess: Function } ) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
   const [percent, setPercent] = useState(0)
 
   const handlePost = function(){
-    
-  }
+    onSuccess()
+  } 
 
   const createPercent = async () => {
     try {
@@ -37,13 +37,14 @@ export default function PercentModal( { lastNumber, onSuccess}: { lastNumber: nu
         }),
       });
       if (response.ok) {
-        console.log("Cliente creado exitosamente");
+        console.log("Lista de precio creado exitosamente");
         onClose();
+        handlePost();
       } else {
-        console.error("Error al crear cliente");
+        console.error("Error al crear Lista de precios");
       }
     } catch (error) {
-      console.error("Error al crear cliente:", error);
+      console.error("Error al crear Lista de precios:", error);
     }
   };
 
@@ -52,7 +53,7 @@ export default function PercentModal( { lastNumber, onSuccess}: { lastNumber: nu
       <Button onPress={onOpen} color='primary' size='sm'>
         <Plus />
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement='top-center'>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement='center'>
         <ModalContent>
           {onClose => (
             <>

@@ -1,16 +1,18 @@
+import DelListModal from '@/modals/DeleteListModal'
 import PercentModal from '@/modals/PercentModal'
 import {
   Button,
   Dropdown,
-  DropdownItem,
   DropdownMenu,
-  DropdownTrigger
+  DropdownTrigger,
+  DropdownItem
 } from '@nextui-org/react'
 import { useEffect, useState } from 'react'
 import { Percent } from 'react-feather'
 
 export default function PercentList() {
   const [percent, setPercent] = useState<any[]>([])
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     getData()
@@ -38,23 +40,18 @@ export default function PercentList() {
 
   const lastNumberPlusOne = percent.length > 0 ? percent[percent.length - 1].number + 1 : 1;
   
-
   return (
-    <Dropdown>
+    <Dropdown isOpen={dropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownTrigger>
         <Button>
           <Percent />
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label='Static Actions' bottomContent={
-      //@ts-ignore
-      <PercentModal lastNumber={lastNumberPlusOne} onSuccess={getData}/>}>
+      <DropdownMenu closeOnSelect={false} aria-label='Static Actions' bottomContent={
+        <PercentModal lastNumber={lastNumberPlusOne} onSuccess={() => { getData(); setDropdownOpen(true); }}/>}>
         {percent.map((e, index) => (
           <DropdownItem key={index}>
-            <div className='flex justify-around'>
-              <p>Lista {e.number}</p>
-              <p>{e.percent}%</p>
-            </div>
+              <DelListModal percent={e.percent} number={e.number} index={index} onDeleteSuccess={getData}/>
           </DropdownItem>
         ))}
       </DropdownMenu>

@@ -1,6 +1,6 @@
 import React from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link, Tabs, Tab} from "@nextui-org/react";
-import { PlusCircle, Edit, Map, Smartphone, DollarSign } from 'react-feather';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Tabs, Tab } from "@nextui-org/react";
+import { Edit, DollarSign } from 'react-feather';
 
 export default function AccountModal() {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();

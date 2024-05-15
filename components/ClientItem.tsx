@@ -1,22 +1,28 @@
-import React from "react";
+import React from 'react'
 import {
   Button,
   Card,
   CardFooter,
   CardHeader,
   Divider
-} from '@nextui-org/react';
-import AccountModal from '@/modals/AccountModal';
+} from '@nextui-org/react'
+import AccountModal from '@/modals/AccountModal'
+import EditClient from '@/modals/EditClient'
+import DelClientModal from '@/modals/DeleteClientModal'
 
 interface Client {
-  name: string;
-  address: string;
-  phone: string;
-  type: string;
+  _id: string
+  name: string
+  address: string
+  phone: string
+  type: string
 }
 
-const ClientItem: React.FC<{ client: Client }> = ({ client }) => {
-  const { name, address, phone, type } = client;
+const ClientItem: React.FC<{ client: Client; fetchData: () => void }> = ({
+  client,
+  fetchData
+}) => {
+  const { name, address, phone, type, _id } = client
 
   return (
     <Card className='max-w-[300px]'>
@@ -30,14 +36,12 @@ const ClientItem: React.FC<{ client: Client }> = ({ client }) => {
       </CardHeader>
       <Divider />
       <CardFooter className='flex items-center justify-center gap-3'>
-        <Button size='sm'>Editar</Button>
+        <EditClient client={client} fetchData={fetchData} />
         <AccountModal />
-        <Button color='danger' size='sm'>
-          Eliminar
-        </Button>
+        <DelClientModal name={name} id={_id} fetchData={fetchData} />
       </CardFooter>
     </Card>
-  );
-};
+  )
+}
 
-export default ClientItem;
+export default ClientItem

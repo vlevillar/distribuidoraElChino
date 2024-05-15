@@ -51,14 +51,14 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
         }
       )
       if (response.ok) {
-        console.log('Cliente creado exitosamente')
+        console.log('Ruta creada exitosamente')
         onClose()
         onAddRoute()
       } else {
-        console.error('Error al crear cliente')
+        console.error('Error al crear ruta')
       }
     } catch (error) {
-      console.error('Error al crear cliente:', error)
+      console.error('Error al crear ruta:', error)
     }
   }
 

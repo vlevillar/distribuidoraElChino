@@ -6,21 +6,22 @@ const Productos = () => {
   const [clients, setClients] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://distributor-api.onrender.com/clients");
-        if (!response.ok) {
-          throw new Error("Failed to fetch clients");
-        }
-        const data = await response.json();
-        setClients(data);
-      } catch (error) {
-        console.error("Error fetching clients:", error);
-      }
-    };
-
     fetchData();
   }, []); 
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("https://distributor-api.onrender.com/clients");
+      if (!response.ok) {
+        throw new Error("Failed to fetch clients");
+      }
+      const data = await response.json();
+      setClients(data);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    }
+  };
+
 
   return (
     <div className="flex items-center justify-center flex-col">
@@ -29,7 +30,7 @@ const Productos = () => {
       </div>
       <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xs:grid-cols-1">
         {clients.map((client, index) => (
-          <ClientItem key={index} client={client} />
+          <ClientItem key={index} client={client} fetchData={fetchData}/>
         ))}
       </div>
     </div>

@@ -80,7 +80,7 @@ const Productos = () => {
         </div>
       </div>
       <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-3">
-        {products.map((product, index) => (
+        {products.map((product, index) => (        
           <ProductItem key={index} price={product.prices[selected]} name={product.name} />
         ))}
       </div>

@@ -8,12 +8,13 @@ import {
   Button,
   useDisclosure
 } from '@nextui-org/react'
-import { Trash2 } from 'react-feather'
+import { Trash2, X } from 'react-feather'
 
 interface Props {
   percent: number | null
   number: number | null
   index: string | number | undefined
+  isLast: boolean
   onDeleteSuccess: Function
 }
 
@@ -21,10 +22,10 @@ const DelListModal: React.FC<Props> = ({
   number,
   percent,
   index,
-  onDeleteSuccess
+  onDeleteSuccess,
+  isLast,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-console.log(isOpen);
 
   const handleDelete = function () {
     onDeleteSuccess()
@@ -53,6 +54,7 @@ console.log(isOpen);
       console.error('Error al eliminar la ruta:', error);
     }
   };
+  console.log(isLast);
   
   return (
     <>
@@ -62,9 +64,9 @@ console.log(isOpen);
           <p>{percent}%</p>
         </div>
       </Button>
-      <Modal isOpen={isOpen} placement='center'>
+      <Modal isOpen={isOpen} onClose={onClose} placement='center'>
+        {!isLast? 
         <ModalContent>
-          {onClose => (
             <>
               <ModalHeader className='flex flex-col gap-1'></ModalHeader>
               <ModalBody className='flex items-center justify-center'>
@@ -76,8 +78,22 @@ console.log(isOpen);
                 </Button>
               </ModalFooter>
             </>
-          )}
         </ModalContent>
+        :
+        <ModalContent>
+        <>
+          <ModalHeader className='flex flex-col gap-1'></ModalHeader>
+          <ModalBody className='flex items-center justify-center'>
+            No se puede eliminar la unica lista
+          </ModalBody>
+          <ModalFooter className='flex items-center justify-center'>
+            <Button color='danger' onPress={onClose}>
+              <X />
+            </Button>
+          </ModalFooter>
+        </>
+    </ModalContent>
+        }
       </Modal>
     </>
   )

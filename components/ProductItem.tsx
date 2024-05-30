@@ -4,7 +4,7 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Divider } from '@nextui
 import { Edit, Trash } from 'react-feather'
 
 interface ProductItemProps {
-    price: string; // Especifica el tipo de la propiedad 'price'
+    price: string;
     name: string;
   }
 

@@ -2,10 +2,10 @@ import ProductItem from "@/components/ProductItem";
 import { Tab, Tabs } from "@nextui-org/react";
 import ProductModal from "@/modals/ProductModal";
 import React, { useEffect, useState } from "react";
-import DelList from "@/modals/DeleteListModal";
+import ListTabs from "@/components/ListTabs";
 
 const Productos = () => {
-  const [selected, setSelected] = React.useState("precio1");
+  const [selected, setSelected] = useState(1);
   const [percent, setPercent] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
 
@@ -65,22 +65,13 @@ const Productos = () => {
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="pb-4 flex flex-col">
-        <ProductModal onProductCreated={handleProductCreated}/>
+        <ProductModal onProductCreated={handleProductCreated} />
         <div>
-          <Tabs
-            variant='underlined'
-            onSelectionChange={handleSelectionChange}
-            aria-label="Options"
-            selectedKey={selected}
-          >
-            {percent.map((e, index) => (
-              <Tab key={index} title={"Lista " + e.number}/>
-            ))}
-          </Tabs>
+          <ListTabs handle={handleSelectionChange} selected={selected} list={percent} />
         </div>
       </div>
       <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-3">
-        {products.map((product, index) => (        
+        {products.map((product, index) => (
           <ProductItem key={index} price={product.prices[selected]} name={product.name} />
         ))}
       </div>

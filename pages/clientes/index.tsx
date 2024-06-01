@@ -22,6 +22,8 @@ const Productos = () => {
     }
   };
 
+  console.log(clients);
+  
 
   return (
     <div className="flex items-center justify-center flex-col">

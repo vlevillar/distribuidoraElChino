@@ -66,7 +66,7 @@ const Productos = () => {
     <div className="flex items-center justify-center flex-col">
       <div className="pb-4 flex flex-col">
         <ProductModal onProductCreated={handleProductCreated} />
-        <div>
+        <div className="flex justify-center pt-2">
           <ListTabs handle={handleSelectionChange} selected={selected} list={percent} />
         </div>
       </div>

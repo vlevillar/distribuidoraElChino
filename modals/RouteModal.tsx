@@ -16,7 +16,7 @@ interface Props {
   onAddRoute: () => void; 
 }
 interface Client {
-  id: number
+  _id: string
   name: string
   address: string
   type: string
@@ -65,6 +65,9 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
   const handleSelectedClientsChange = (clients: Client[]) => {
     setSelectedClients(clients)
   }
+
+  console.log(selectedClients);
+  
 
   return (
     <>

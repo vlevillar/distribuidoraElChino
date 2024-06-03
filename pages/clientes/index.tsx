@@ -2,12 +2,22 @@ import React, { useState, useEffect } from "react";
 import ClientItem from "@/components/ClientItem";
 import ClientModal from "@/modals/ClientModal";
 
-const Productos = () => {
-  const [clients, setClients] = useState([]);
+interface Client {
+  _id: string;
+  name: string;
+  currentAccount: number;
+  clientNumber: number;
+  address: string;
+  phone: string;
+  type: string;
+}
+
+const Productos: React.FC = () => {
+  const [clients, setClients] = useState<Client[]>([]);
 
   useEffect(() => {
     fetchData();
-  }, []); 
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -23,16 +33,18 @@ const Productos = () => {
   };
 
   console.log(clients);
-  
+
+  // Ordenar la lista de clientes por clientNumber
+  const sortedClients = [...clients].sort((a, b) => a.clientNumber - b.clientNumber);
 
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="pb-4 flex flex-col">
-        <ClientModal />
+        <ClientModal onClientCreated={fetchData} />
       </div>
       <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xs:grid-cols-1">
-        {clients.map((client, index) => (
-          <ClientItem key={index} client={client} fetchData={fetchData}/>
+        {sortedClients.map((client) => (
+          <ClientItem key={client._id} client={client} fetchData={fetchData} />
         ))}
       </div>
     </div>

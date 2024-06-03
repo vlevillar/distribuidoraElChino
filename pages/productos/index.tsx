@@ -62,6 +62,9 @@ const Productos = () => {
     getProducts();
   };
 
+  console.log(products);
+  
+
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="pb-4 flex flex-col">
@@ -72,7 +75,7 @@ const Productos = () => {
       </div>
       <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-3">
         {products.map((product, index) => (
-          <ProductItem key={index} price={product.prices[selected]} name={product.name} />
+          <ProductItem key={index} price={product.prices[selected]} name={product.name} id={product._id} fetchData={getProducts}/>
         ))}
       </div>
     </div>

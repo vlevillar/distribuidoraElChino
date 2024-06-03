@@ -26,7 +26,7 @@ interface AccountModalProps {
 
 const AccountModal: React.FC<AccountModalProps> = ({ client, fetchData }) => {
   const { _id, name, currentAccount } = client;
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [isFocused1, setIsFocused1] = useState(false);
   const [isFocused2, setIsFocused2] = useState(false);
   const [payAmount, setPayAmount] = useState('');
@@ -45,6 +45,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ client, fetchData }) => {
 
       if (response.ok) {
         console.log('Cuenta actualizada exitosamente');
+        onClose()
         setIsFocused1(false);
         setIsFocused2(false);
         setPayAmount("")

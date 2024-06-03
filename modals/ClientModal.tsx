@@ -11,7 +11,11 @@ import {
 } from "@nextui-org/react";
 import { PlusCircle, Edit, Map, Smartphone, Briefcase } from "react-feather";
 
-export default function ClientModal() {
+interface ClientModalProps {
+  onClientCreated: () => void;
+}
+
+const ClientModal: React.FC<ClientModalProps> = ({ onClientCreated }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nombre, setNombre] = useState("");
   const [direccion, setDireccion] = useState("");
@@ -23,7 +27,7 @@ export default function ClientModal() {
       const response = await fetch("https://distributor-api.onrender.com/clients", {
         method: "POST",
         headers: {
-          "admin" : "true",
+          "admin": "true",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -35,6 +39,7 @@ export default function ClientModal() {
       });
       if (response.ok) {
         console.log("Cliente creado exitosamente");
+        onClientCreated();
         onClose();
       } else {
         console.error("Error al crear cliente");
@@ -84,7 +89,7 @@ export default function ClientModal() {
               label="Tipo de negocio"
               placeholder="Kiosco, despensa, etc..."
               variant="bordered"
-              endContent={<Briefcase/>}
+              endContent={<Briefcase />}
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
             />
@@ -102,3 +107,5 @@ export default function ClientModal() {
     </>
   );
 }
+
+export default ClientModal;

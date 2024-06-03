@@ -11,7 +11,7 @@ import {
 import { Users, XCircle } from 'react-feather'
 
 interface Client {
-  id: number
+  _id: string
   name: string
   address: string
   type: string
@@ -54,14 +54,14 @@ export default function SearchClient({ onSelectedClientsChange }: SearchClientPr
       updatedChips[index] = !updatedChips[index];
       return updatedChips;
     });
-  
+
     const selectedClient = filteredClients[index];
     if (!selectedChips[index]) {
       const newSelectedClients = [...selectedClients, selectedClient];
       setSelectedClients(newSelectedClients);
       onSelectedClientsChange(newSelectedClients)
     } else {
-      const newSelectedClients = selectedClients.filter(client => client.id !== selectedClient.id);
+      const newSelectedClients = selectedClients.filter(client => client._id !== selectedClient._id);
       setSelectedClients(newSelectedClients);
       onSelectedClientsChange(newSelectedClients)
     }
@@ -88,7 +88,7 @@ export default function SearchClient({ onSelectedClientsChange }: SearchClientPr
         <div className='scroll-container flex h-24 flex-wrap gap-1 overflow-y-auto'>
           {sortedClients.map((client, index) => (
             <Chip
-              key={client.id}
+              key={client._id}
               onClick={() => handleChipClick(index)}
               color={selectedChips[index] ? 'success' : 'default'}
             >
@@ -101,14 +101,14 @@ export default function SearchClient({ onSelectedClientsChange }: SearchClientPr
       <CardFooter>
         <div className='flex flex-col w-full'>
           <div className='w-full'>
-          <p>Clientes Seleccionados:</p>
+            <p>Clientes Seleccionados:</p>
           </div>
           <div className='scroll-container flex h-24 w-full flex-wrap gap-1 overflow-y-auto pt-2'>
             {selectedClients.map(client => (
               <Chip
                 className='cursor-pointer'
-                key={client.id}
-                onClick={() => handleChipClick(filteredClients.findIndex(c => c.id === client.id))}
+                key={client._id}
+                onClick={() => handleChipClick(filteredClients.findIndex(c => c._id === client._id))}
                 variant='faded'
                 color='danger'
                 startContent={<XCircle size={18} />}

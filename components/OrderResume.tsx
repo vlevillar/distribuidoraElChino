@@ -19,16 +19,19 @@ interface Product {
   _id: string;
   name: string;
   prices: number[];
-  quantity: number;
+  quantity?: number;
+  selectedMeasurement?: string;
+  selectedPrice?: number;
 }
 
 interface OrderResumeProps {
   selectedProducts: Product[];
+  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   selectedList: number;
   onTotalChange: (total: number) => void;
 }
 
-const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedList, onTotalChange }) => {
+const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedList, onTotalChange, setProducts }) => {
   const [selectedKeys, setSelectedKeys] = React.useState<{ [key: string]: Selection }>({});
   const [quantities, setQuantities] = React.useState<{ [key: string]: string }>({});
 
@@ -52,6 +55,27 @@ const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedLis
     }, 0);
     onTotalChange(total);
   }, [selectedProducts, selectedList, quantities, onTotalChange]);
+  
+  useEffect(() => {
+    const mergedArray = selectedProducts.map(product => {
+      const selectedKey = Array.from(selectedKeys[product._id] || new Set(['Kg.']))[0]; 
+      const selectedKeyString = String(selectedKey); 
+
+      const selectedMeasurement = selectedKeyString === 'Kg.' ? 'kilogram' : 'unit';
+
+      const pxkg = product.prices[selectedList];
+    
+      return {
+        ...product,
+        selectedMeasurement,
+        quantity: Number(quantities[product._id] || 0),
+        selectedPrice: pxkg
+      };
+    });
+
+    console.log(mergedArray);
+    setProducts(mergedArray);
+  }, [selectedProducts, selectedKeys, quantities, selectedList, setProducts]);
 
   return (
     <Table removeWrapper aria-label='Example static collection table'>

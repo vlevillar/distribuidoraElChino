@@ -3,12 +3,13 @@ import { Card, CardHeader, CardBody, Divider, Input, Chip } from '@nextui-org/re
 import { Users } from 'react-feather';
 
 interface Client {
-  id?: number;
-  _id: number;
-  name: string;
-  address: string;
-  type: string;
-  phone: string;
+  id?: string
+  _id: string
+  clientNumber: number;
+  name: string
+  address: string
+  type: string
+  phone: string
 }
 
 interface SearchClientProps {

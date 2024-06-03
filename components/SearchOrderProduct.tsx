@@ -13,6 +13,7 @@ interface Product {
   _id: string;
   name: string;
   prices: number[];
+  measurement: string;
   quantity: number;
 }
 
@@ -25,7 +26,7 @@ export default function SearchOrderProduct({ onSelectedProductChange }: SearchPr
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedChips, setSelectedChips] = useState<boolean[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {

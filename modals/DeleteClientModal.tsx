@@ -22,7 +22,7 @@ const DelClientModal: React.FC<Props> = ({ name, id, fetchData }) => {
   const handleDeleteClient = async () => {
     try {
       const response = await fetch(
-        `https://distributor-api.onrender.com/clients/${id}`,
+        `${process.env.API_URL}/clients/${id}`,
         {
           method: 'DELETE',
           headers: {

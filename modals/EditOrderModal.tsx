@@ -9,11 +9,11 @@ import {
   useDisclosure,
   Input
 } from '@nextui-org/react'
-import { Percent, PlusCircle } from 'react-feather'
+import { Percent } from 'react-feather'
 import SearchOrderClient from '@/components/SearchOrderClient'
 import SearchOrderProduct from '@/components/SearchOrderProduct'
-import OrderResume from '@/components/OrderResume'
 import ListTabs from '@/components/ListTabs'
+import EditOrderResume from '@/components/EditOrderResume'
 
 interface Client {
   _id: string
@@ -34,11 +34,21 @@ interface Product {
   selectedPrice?: number; 
 }
 
-interface OrderModalProps {
+interface Order {
+  _id: string;
+  clientId: string;
+  clientName: string;
+  clientNumber: number;
+  products: Product[];
+  discount: string;
+}
+
+interface EditOrderModalProps {
+  order: Order;
   onSuccess: () => void;
 }
 
-export default function OrderModal({ onSuccess }: OrderModalProps) {
+const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure()
   const [percent, setPercent] = useState<any[]>([])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
@@ -48,10 +58,25 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [discount, setDiscount] = useState('')
   const [total, setTotal] = useState(0)
   const [totalWithDiscount, setTotalWithDiscount] = useState(0)
+console.log(percent);
 
   useEffect(() => {
     getPricesList()
   }, [])
+
+  useEffect(() => {
+    setSelectedClient({
+      _id: order.clientId,
+      clientNumber: order.clientNumber,
+      name: order.clientName,
+      address: '',
+      type: '',
+      phone: ''
+    })
+    setSelectedProducts(order.products)
+    setDiscount(order.discount)
+    calculateTotalWithDiscount()
+  }, [order])
 
   useEffect(() => {
     calculateTotalWithDiscount()
@@ -85,14 +110,6 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     setSelectedProducts(products)
   }
 
-  const handleClose = () => {
-    setSelectedClient(null)
-    setSelectedProducts([])
-    setDiscount('')
-    setTotal(0)
-    setTotalWithDiscount(0)
-  }
-
   const handleSelectionChange = (key: any) => {
     setSelected(key)
   }
@@ -111,7 +128,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     }
   }
 
-  const handleCreateOrder = async () => {
+  const handleUpdateOrder = async () => {
     if (!selectedClient || selectedProducts.length === 0) {
       console.error('Client or products not selected');
       return;
@@ -131,8 +148,8 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     };
 
     try {
-      const response = await fetch(`${process.env.API_URL}/orders`, {
-        method: 'POST',
+      const response = await fetch(`${process.env.API_URL}/pricesList/orders/${order._id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -140,26 +157,24 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       });
 
       if (response.ok) {
-        console.log('Order created successfully');
+        console.log('Order updated successfully');
         onClose()
         onSuccess()
-        handleClose();
       } else {
-        console.error('Error creating order');
+        console.error('Error updating order');
       }
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error('Error updating order:', error);
     }
   };
 
   return (
     <>
-      <Button onPress={onOpen} color='success' startContent={<PlusCircle />}>
-        Agregar pedido
+      <Button onPress={onOpen} size='sm'>
+        Editar
       </Button>
       <Modal
         isOpen={isOpen}
-        onClose={handleClose}
         onOpenChange={onOpenChange}
         placement='top-center'
       >
@@ -167,26 +182,28 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
           {onClose => (
             <>
               <ModalHeader className='flex flex-col gap-1'>
-                Agregar pedido
+                Editar pedido
               </ModalHeader>
               <ModalBody>
                 <SearchOrderClient
                   onSelectedClientsChange={handleSelectedClientChange}
+                  initialClient={selectedClient}
                 />
                 <SearchOrderProduct
                   onSelectedProductChange={handleSelectedProductChange}
+                  initialProducts={selectedProducts}
                 />
                 <ListTabs
                   handle={handleSelectionChange}
                   selected={selected}
                   list={percent}
                 />
-                <OrderResume
+                {/* <EditOrderResume
                   selectedProducts={selectedProducts}
                   selectedList={selected}
                   onTotalChange={handleTotalChange}
                   setProducts={setProducts}
-                />
+                /> */}
                 <div className='flex justify-end'>
                   <div>
                     <Input
@@ -194,6 +211,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                       placeholder='0.00'
                       variant='underlined'
                       type='number'
+                      value={discount}
                       onChange={e => setDiscount(e.target.value)}
                       endContent={<Percent />}
                     />
@@ -208,11 +226,11 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                   Cerrar
                 </Button>
                 <Button 
-                  color='success' 
-                  onPress={handleCreateOrder}
+                  color='primary' 
+                  onPress={handleUpdateOrder}
                   isDisabled={total === 0}
                 >
-                  Crear
+                  Editar
                 </Button>
               </ModalFooter>
             </>
@@ -222,3 +240,5 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     </>
   )
 }
+
+export default EditOrderModal

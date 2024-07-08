@@ -24,7 +24,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ onClientCreated }) => {
 
   const crearCliente = async () => {
     try {
-      const response = await fetch("https://distributor-api.onrender.com/clients", {
+      const response = await fetch(`${process.env.API_URL}/clients`, {
         method: "POST",
         headers: {
           "admin": "true",

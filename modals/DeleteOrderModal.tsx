@@ -16,13 +16,13 @@ interface Props {
   fetchData: () => void
 }
 
-const DelProductModal: React.FC<Props> = ({ name, id, fetchData }) => {
+const DelOrderModal: React.FC<Props> = ({ name, id, fetchData }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const handleDeleteClient = async () => {
+  const handleDeleteOrder = async () => {
     try {
       const response = await fetch(
-        `${process.env.API_URL}/pricesList/products/${id}`,
+        `${process.env.API_URL}/pricesList/orders/${id}`,
         {
           method: 'DELETE',
           headers: {
@@ -31,14 +31,14 @@ const DelProductModal: React.FC<Props> = ({ name, id, fetchData }) => {
         }
       );
       if (response.ok) {
-        console.log('Producto eliminado exitosamente');
+        console.log('Orden eliminada exitosamente');
         onClose();
-        fetchData()
+        fetchData();
       } else {
-        console.error('Error al eliminar el producto');
+        console.error('Error al eliminar la orden');
       }
     } catch (error) {
-      console.error('Error al eliminar el producto:', error);
+      console.error('Error al eliminar la orden:', error);
     }
   };
   
@@ -55,7 +55,7 @@ const DelProductModal: React.FC<Props> = ({ name, id, fetchData }) => {
                 ¿Eliminar a {name}?
               </ModalBody>
               <ModalFooter className='flex items-center justify-center'>
-                <Button color='danger' onPress={handleDeleteClient}>
+                <Button color='danger' onPress={handleDeleteOrder}>
                   <Trash2 />
                 </Button>
               </ModalFooter>
@@ -66,4 +66,4 @@ const DelProductModal: React.FC<Props> = ({ name, id, fetchData }) => {
   )
 }
 
-export default DelProductModal
+export default DelOrderModal

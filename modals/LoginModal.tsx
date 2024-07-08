@@ -1,0 +1,103 @@
+import React, { useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input } from "@nextui-org/react";
+import { Lock, User } from "react-feather";
+
+interface LoginModalProps {
+  onLogin: (username: string) => void;
+}
+
+export default function LoginModal({ onLogin }: LoginModalProps) {
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      const loginResponse = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      });
+      
+      if (loginResponse.status === 201) {
+        const loginData = await loginResponse.json();
+        const accessToken = loginData.access_token;
+  
+        const profileResponse = await fetch('http://localhost:3000/auth/profile', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          onLogin(profileData.username);
+          onClose() 
+        } else {
+          console.error('Error al obtener el perfil:', profileResponse.statusText);
+        }
+      } else {
+        console.error('Error al iniciar sesión:', loginResponse.statusText);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud de inicio de sesión:', error);
+    }
+  };
+
+  return (
+    <>
+      <Button onPress={onOpen} color="primary">Ingresar</Button>
+      <Modal 
+        isOpen={isOpen} 
+        onOpenChange={onOpenChange}
+        placement="top-center"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Ingresar</ModalHeader>
+              <ModalBody>
+                <Input
+                  autoFocus
+                  endContent={
+                    <User className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                  }
+                  label="Usuario"
+                  placeholder="Ingrese su usuario"
+                  variant="bordered"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+                <Input
+                  endContent={
+                    <Lock className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                  }
+                  label="Contraseña"
+                  placeholder="Ingrese su contraseña"
+                  type="password"
+                  variant="bordered"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Cerrar
+                </Button>
+                <Button color="primary" onPress={handleLogin}>
+                  Iniciar sesión
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}

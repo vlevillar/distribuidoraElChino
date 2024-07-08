@@ -17,7 +17,7 @@ const Productos = () => {
   const getPricesList = async () => {
     try {
       const response = await fetch(
-        `https://distributor-api.onrender.com/pricesList`,
+        `${process.env.API_URL}/pricesList`,
         {
           method: 'GET'
         }
@@ -37,7 +37,7 @@ const Productos = () => {
   const getProducts = async () => {
     try {
       const response = await fetch(
-        `https://distributor-api.onrender.com/products`,
+        `${process.env.API_URL}/products`,
         {
           method: 'GET'
         }

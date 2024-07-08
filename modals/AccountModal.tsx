@@ -35,7 +35,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ client, fetchData }) => {
   const handleUpdateAccount = async (newAccountValue: number) => {
     try {
       const updatedClient = { ...client, currentAccount: newAccountValue, id: client._id };
-      const response = await fetch(`https://distributor-api.onrender.com/clients`, {
+      const response = await fetch(`${process.env.API_URL}/clients`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

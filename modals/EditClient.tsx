@@ -29,7 +29,7 @@ const EditClient: React.FC<{ client: Client, fetchData: () => void }> = ({ clien
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('https://distributor-api.onrender.com/clients', {
+      const response = await fetch(`${process.env.API_URL}/clients`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

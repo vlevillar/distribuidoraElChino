@@ -38,7 +38,7 @@ export default function ProductModal( { onProductCreated } : { onProductCreated:
   const createProduct = async () => {
     try {
       const response = await fetch(
-        'https://distributor-api.onrender.com/products',
+        `${process.env.API_URL}/products`,
         {
           method: 'POST',
           headers: {

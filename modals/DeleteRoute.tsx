@@ -23,7 +23,7 @@ const DelRoute: React.FC<Props> = ({ currentDate, routeId, disabled, onDeleteSuc
   const handleDeleteRoute = async () => {
     try {
       if (routeId) {
-        const response = await fetch(`https://distributor-api.onrender.com/routes/${routeId}`, {
+        const response = await fetch(`${process.env.API_URL}/pricesList/routes/${routeId}`, {
           method: 'DELETE'
         });
         if (response.ok) {

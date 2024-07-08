@@ -21,7 +21,7 @@ export default function PercentList() {
   const getData = async () => {
     try {
       const response = await fetch(
-        `https://distributor-api.onrender.com/pricesList`,
+        `${process.env.API_URL}/pricesList`,
         {
           method: 'GET'
         }

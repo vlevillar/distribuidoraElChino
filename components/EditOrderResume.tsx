@@ -25,17 +25,24 @@ interface Product {
   selectedPrice?: number; 
 }
 
-
-interface OrderResumeProps {
+interface EditOrderResumeProps {
   selectedProducts: Product[];
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   selectedList: number;
   onTotalChange: (total: number) => void;
 }
 
-const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedList, onTotalChange, setProducts }) => {
+const EditOrderResume: React.FC<EditOrderResumeProps> = ({ selectedProducts, selectedList, onTotalChange, setProducts }) => {
   const [selectedKeys, setSelectedKeys] = React.useState<{ [key: string]: Selection }>({});
   const [quantities, setQuantities] = React.useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    const initialQuantities: { [key: string]: string } = {};
+    selectedProducts.forEach(product => {
+      initialQuantities[product._id] = String(product.quantity);
+    });
+    setQuantities(initialQuantities);
+  }, [selectedProducts]);
 
   const handleQuantityChange = (id: string, value: string) => {
     setQuantities(prev => ({ ...prev, [id]: value }));
@@ -51,7 +58,7 @@ const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedLis
 
   useEffect(() => {
     const total = selectedProducts.reduce((sum, product) => {
-      const quantity = Number(quantities[product._id] || 0);
+      const quantity = Number(quantities[product._id] || product.quantity);
       const price = product.prices[selectedList];
       return sum + price * quantity;
     }, 0);
@@ -70,15 +77,15 @@ const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedLis
       return {
         ...product,
         selectedMeasurement,
-        quantity: Number(quantities[product._id] || 0),
+        quantity: Number(quantities[product._id] || product.quantity),
         selectedPrice: pxkg
       };
     });
 
-    console.log(mergedArray);
     setProducts(mergedArray);
   }, [selectedProducts, selectedKeys, quantities, selectedList, setProducts]);
 
+  
   return (
     <Table removeWrapper aria-label='Example static collection table'>
       <TableHeader>
@@ -98,6 +105,7 @@ const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedLis
                 variant='underlined'
                 type='number'
                 onChange={(e) => handleQuantityChange(product._id, e.target.value)}
+                defaultValue={String(product.quantity)}
               />
             </TableCell>
             <TableCell>
@@ -121,7 +129,7 @@ const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedLis
               </Dropdown>
             </TableCell>
             <TableCell>{product.prices[selectedList].toFixed(2)}</TableCell>
-            <TableCell>{(product.prices[selectedList] * Number(quantities[product._id] || 0)).toFixed(2)}</TableCell>
+            <TableCell>{(product.prices[selectedList] * Number(quantities[product._id] || product.quantity)).toFixed(2)}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -129,4 +137,4 @@ const OrderResume: React.FC<OrderResumeProps> = ({ selectedProducts, selectedLis
   );
 };
 
-export default OrderResume;
+export default EditOrderResume;

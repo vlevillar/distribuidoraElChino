@@ -37,7 +37,7 @@ const StatusSelect: React.FC<Props> = ({ routeId, clientId, status }) => {
     const status: string = statusMap[Array.from(keys)[0]] || 'NOT_VISITED'; // Default to 'NOT_VISITED'
     if (routeId && clientId && status) {
       // Perform PUT request here
-      fetch(`https://distributor-api.onrender.com/routes`, {
+      fetch(`${process.env.API_URL}/routes`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

@@ -14,17 +14,18 @@ interface Client {
 
 interface SearchClientProps {
   onSelectedClientsChange: (clients: Client[]) => void;
+  initialClient?: Client | null | undefined; // Propiedad opcional para inicializar el cliente seleccionado
 }
 
-export default function SearchOrderClient({ onSelectedClientsChange }: SearchClientProps) {
+export default function SearchOrderClient({ onSelectedClientsChange, initialClient }: SearchClientProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null | undefined>(initialClient); // Inicialización con initialClient
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://distributor-api.onrender.com/clients');
+        const response = await fetch(`${process.env.API_URL}/clients`);
         if (!response.ok) {
           throw new Error('Failed to fetch clients');
         }
@@ -37,6 +38,10 @@ export default function SearchOrderClient({ onSelectedClientsChange }: SearchCli
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setSelectedClient(initialClient); // Actualización del cliente seleccionado al inicializar
+  }, [initialClient]);
 
   const handleChipClick = (client: Client) => {
     if (selectedClient?.id === client.id) {

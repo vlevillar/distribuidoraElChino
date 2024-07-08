@@ -25,7 +25,7 @@ export default function PercentModal( { lastNumber, onSuccess }: { lastNumber: n
 
   const createPercent = async () => {
     try {
-      const response = await fetch("https://distributor-api.onrender.com/pricesList", {
+      const response = await fetch(`${process.env.API_URL}/pricesList`, {
         method: "POST",
         headers: {
           "admin" : "true",

@@ -36,7 +36,7 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
   const updateProduct = async () => {
     try {
       const response = await fetch(
-        `https://distributor-api.onrender.com/products/${product._id}`,
+        `${process.env.API_URL}/products/${product._id}`,
         {
           method: 'PUT',
           headers: {

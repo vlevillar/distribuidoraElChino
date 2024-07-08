@@ -44,7 +44,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
     try {
       const dateFormatted = formatDate(date)
       const response = await fetch(
-        `https://distributor-api.onrender.com/routes?startDate=${dateFormatted}&endDate=${dateFormatted}`,
+        `${process.env.API_URL}/routes?startDate=${dateFormatted}&endDate=${dateFormatted}`,
         {
           method: 'GET'
         }
@@ -75,7 +75,7 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
   
   const handleDeleteClient = async (routeId: string, clientId: string) => {
     try {
-      const response = await fetch(`https://distributor-api.onrender.com/routes/${routeId}/${clientId}`, {
+      const response = await fetch(`${process.env.API_URL}/routes/${routeId}/${clientId}`, {
         method: 'DELETE'
       });
       if (response.ok) {
@@ -97,6 +97,9 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
   const handleAddRoute = () => {
     getData();
   };
+
+  console.log(routes);
+  
 
   return (
     <Table

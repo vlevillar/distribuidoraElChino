@@ -21,7 +21,7 @@ const Productos: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("https://distributor-api.onrender.com/clients");
+      const response = await fetch(`${process.env.API_URL}/clients`);
       if (!response.ok) {
         throw new Error("Failed to fetch clients");
       }

@@ -37,7 +37,7 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
   const crearCliente = async () => {
     try {
       const response = await fetch(
-        'https://distributor-api.onrender.com/routes',
+        `${process.env.API_URL}/routes`,
         {
           method: 'POST',
           headers: {

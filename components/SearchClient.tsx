@@ -32,7 +32,7 @@ export default function SearchClient({ onSelectedClientsChange }: SearchClientPr
     const fetchData = async () => {
       try {
         const response = await fetch(
-          'https://distributor-api.onrender.com/clients'
+          `${process.env.API_URL}/clients`
         )
         if (!response.ok) {
           throw new Error('Failed to fetch clients')

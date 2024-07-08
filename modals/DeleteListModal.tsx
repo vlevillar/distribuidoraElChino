@@ -34,7 +34,7 @@ const DelListModal: React.FC<Props> = ({
   const handleDeleteList = async () => {
     try {
       const response = await fetch(
-        `https://distributor-api.onrender.com/pricesList`,
+        `${process.env.API_URL}/pricesList`,
         {
           method: 'DELETE',
           headers: {

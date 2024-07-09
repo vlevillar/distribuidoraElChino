@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LoginModal from '@/modals/LoginModal';
 import {
   Avatar,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow
 } from '@nextui-org/react';
-import { Unlock } from 'react-feather';
 import RegisterModal from '@/modals/RegisterModal';
 import RecoverModal from '@/modals/RecoverModal';
+import OpenRoute from '@/components/OpenRoute';
 
 export default function Home() {
   const [isLogged, setIsLogged] = useState(false);
   const [userProfile, setUserProfile] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setIsLogged(true);
+      setUserProfile(storedUsername);
+    }
+  }, []);
 
   const handleLogin = (profile: string) => {
     setIsLogged(true);
@@ -26,6 +28,7 @@ export default function Home() {
   const handleLogout = () => {
     setIsLogged(false);
     setUserProfile(null);
+    localStorage.removeItem('username');
   };
 
   return (
@@ -43,7 +46,7 @@ export default function Home() {
             </Button>
           </div>
         ) : (
-          <div className='flex justify-between gap-2 py-2'>
+          <div className='flex justify-between gap-2 py-2 pb-4'>
             <LoginModal onLogin={handleLogin} />
             <RegisterModal/>
             <RecoverModal />
@@ -51,33 +54,7 @@ export default function Home() {
         )}
       </div>
       <div className='w-full'>
-        <Table
-          aria-label='Example empty table'
-          topContent={
-            <div className='flex items-center justify-center gap-2'>
-              <Unlock size={18} /> <p>Ruta abierta:</p>
-            </div>
-          }
-        >
-          <TableHeader>
-            <TableColumn>Nombre</TableColumn>
-            <TableColumn>Direccion</TableColumn>
-            <TableColumn>Articulos</TableColumn>
-            <TableColumn>Total</TableColumn>
-          </TableHeader>
-          <TableBody emptyContent={'No hay rutas abiertas.'}>
-            {isLogged ? (
-              <TableRow>
-                <TableCell>carlo</TableCell>
-                <TableCell>carlospaz</TableCell>
-                <TableCell>12 articulos</TableCell>
-                <TableCell>$1212</TableCell>
-              </TableRow>
-            ) : (
-              []
-            )}
-          </TableBody>
-        </Table>
+        <OpenRoute/>
       </div>
     </div>
   );

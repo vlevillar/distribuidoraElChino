@@ -23,7 +23,7 @@ const DelRoute: React.FC<Props> = ({ currentDate, routeId, disabled, onDeleteSuc
   const handleDeleteRoute = async () => {
     try {
       if (routeId) {
-        const response = await fetch(`${process.env.API_URL}/pricesList/routes/${routeId}`, {
+        const response = await fetch(`${process.env.API_URL}/routes/${routeId}`, {
           method: 'DELETE'
         });
         if (response.ok) {
@@ -51,7 +51,7 @@ const DelRoute: React.FC<Props> = ({ currentDate, routeId, disabled, onDeleteSuc
           Borrar Ruta
         </Button>
       ) : (
-        <Button disabled={disabled} startContent={<Trash2 />}>
+        <Button startContent={<Trash2 />}>
           Borrar Ruta
         </Button>
       )}

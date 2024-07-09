@@ -75,8 +75,14 @@ export default function RegisterModal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {success && <p style={{ color: 'green' }}>{success}</p>}
+                {error &&
+                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                <p style={{ color: 'red' }}>{error}</p>
+                </div>}
+                {success && 
+                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                <p style={{ color: 'green' }}>{success}</p>
+                </div>}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>

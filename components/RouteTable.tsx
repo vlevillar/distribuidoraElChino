@@ -1,83 +1,100 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableHeader,
   TableColumn,
   TableBody,
   TableRow,
-  TableCell
-} from '@nextui-org/react'
-import RouteModal from '@/modals/RouteModal'
-import StatusSelect from './StatusSelect'
-import DelRoute from '@/modals/DeleteRoute'
-import { Trash2 } from 'react-feather'
+  TableCell,
+  Button
+} from '@nextui-org/react';
+import RouteModal from '@/modals/RouteModal';
+import StatusSelect from './StatusSelect';
+import DelRoute from '@/modals/DeleteRoute';
+import { Lock, Trash2 } from 'react-feather';
+
 interface RouteTableProps {
-  date: string | null
+  date: string | null;
+}
+
+interface RouteClient {
+  name: string;
+  type: string;
+  address: string;
+  phone: string;
+  currentAccount: number;
+  status: string;
+  _id: string;
 }
 
 interface Route {
-  clients: {
-    name: string
-    type: string
-    address: string
-    phone: string
-    currentAccount: number
-    status: string
-    _id: string
-  }[]
-  date: string
-  _id: string
+  clients: RouteClient[];
+  date: string;
+  _id: string;
 }
 
 const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
-  const [routes, setRoutes] = useState<Route[]>([])
-  const [disabled, setDisabled] = useState(false)
-  const [routeId, setRouteId] = useState('')
+  const [routes, setRoutes] = useState<Route[]>([]);
+  const [disabled, setDisabled] = useState(false);
+  const [routeId, setRouteId] = useState('');
+  const [openRoute, setOpenRoute] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [isOpenRoute, setIsOpenRoute] = useState<boolean | null>(null);
 
   const formatDate = (dateString: string | null): string | null => {
-    if (!dateString) return null
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-  }
+    if (!dateString) return null;
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
 
   const getData = async () => {
     try {
-      const dateFormatted = formatDate(date)
+      const dateFormatted = formatDate(date);
+      if (!dateFormatted) {
+        console.error('Fecha no válida');
+        return;
+      }
       const response = await fetch(
-        `${process.env.API_URL}/routes?startDate=${dateFormatted}&endDate=${dateFormatted}`,
+        `${process.env.API_URL}/routes?date=${dateFormatted}`,
         {
-          method: 'GET'
+          method: 'GET',
         }
-      )
+      );
+
       if (response.ok) {
-        console.log('Datos obtenidos exitosamente')
-        const data = await response.json()
-        setRouteId(data._id)
-        setRoutes(data)
-        if (data.clients.length !== 0) {
-          setDisabled(true)
-        } else {
-          setDisabled(false)
-        }
+        const data = await response.json();
+        console.log('Datos obtenidos exitosamente:', data);
+        setRouteId(data[0]?._id || '');
+        setRoutes(data);
+        setDisabled(data[0]?.clients.length !== 0);
       } else {
-        console.error('Error al obtener datos')
-        setRoutes([])
+        console.error('Error al obtener datos:', response.statusText);
+        setDisabled(false);
       }
     } catch (error) {
-      console.error('Error al obtener datos:', error)
-      setRoutes([])
+      console.error('Error al obtener datos:', error);
+      setDisabled(false);
     }
-  }
+  };
 
   useEffect(() => {
-    getData()
-  }, [date])
-  
+    getData();
+    const storedUsername = localStorage.getItem('username');
+    setUsername(storedUsername);
+
+    const storedOpenRoute = localStorage.getItem('openRoute');
+    setIsOpenRoute(storedOpenRoute === date);
+    setOpenRoute(storedOpenRoute);
+  }, [date]);
+
   const handleDeleteClient = async (routeId: string, clientId: string) => {
     try {
-      const response = await fetch(`${process.env.API_URL}/routes/${routeId}/${clientId}`, {
-        method: 'DELETE'
-      });
+      const response = await fetch(
+        `${process.env.API_URL}/routes/${routeId}/${clientId}`,
+        {
+          method: 'DELETE',
+        }
+      );
       if (response.ok) {
         console.log('Cliente eliminado exitosamente');
         getData();
@@ -89,17 +106,69 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
     }
   };
 
+  const handleOpenRoute = async () => {
+    try {
+      const dateFormatted = formatDate(date);
+      if (!dateFormatted) {
+        console.error('Fecha no válida para abrir la ruta');
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.API_URL}/user/${username}/selectedDate`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            selectedDate: dateFormatted,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log('Ruta abierta exitosamente');
+        localStorage.setItem('openRoute', date || '');
+        setOpenRoute(dateFormatted);
+        setIsOpenRoute(true);
+      } else {
+        console.error('Error al abrir ruta:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error al abrir ruta:', error);
+    }
+  };
+
+  const handleCloseRoute = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.API_URL}/user/${username}/selectedDate`,
+        {
+          method: 'DELETE',
+        }
+      );
+      if (response.ok) {
+        console.log('Ruta cerrada exitosamente');
+        localStorage.removeItem('openRoute');
+        setOpenRoute(null);
+        setIsOpenRoute(false);
+      } else {
+        console.error('Error al cerrar ruta');
+      }
+    } catch (error) {
+      console.error('Error al cerrar ruta:', error);
+    }
+  };
+
   const handleDeleteSuccess = () => {
     getData();
-    setDisabled(false)
+    setDisabled(false);
   };
 
   const handleAddRoute = () => {
     getData();
   };
-
-  console.log(routes);
-  
 
   return (
     <Table
@@ -110,13 +179,38 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
       }
       bottomContent={
         <div className='flex flex-col gap-2'>
-          <RouteModal currentDate={date} onAddRoute={handleAddRoute}/>
+          <RouteModal currentDate={date} onAddRoute={handleAddRoute} />
           <DelRoute
             currentDate={date}
             routeId={routeId}
             disabled={disabled}
-            onDeleteSuccess={handleDeleteSuccess} 
+            onDeleteSuccess={handleDeleteSuccess}
           />
+          {username ? (
+            isOpenRoute === true ? (
+              <Button
+                color='danger'
+                onClick={handleCloseRoute}
+                startContent={<Lock size={'22'} />}
+              >
+                Cerrar Ruta
+              </Button>
+            ) : (
+              <Button
+                color='success'
+                onClick={handleOpenRoute}
+                startContent={<Lock size={'22'} />}
+              >
+                Abrir Ruta
+              </Button>
+            )
+          ) : (
+            <div className='flex items-center justify-center'>
+              <p style={{ color: 'red' }}>
+                Usuario no encontrado, inicie sesión
+              </p>
+            </div>
+          )}
         </div>
       }
     >
@@ -126,26 +220,34 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
         <TableColumn>DIRECCIÓN</TableColumn>
         <TableColumn>ESTADO</TableColumn>
       </TableHeader>
-      <TableBody>
-        {/*@ts-ignore*/}
-        {routes ? (routes.clients?.map((route, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Trash2 color='red' className='cursor-pointer' onClick={() => handleDeleteClient(routeId, route._id)}/>
-              </TableCell>
-              <TableCell>{route.name}</TableCell>
-              <TableCell>{route.address}</TableCell>
-              <TableCell className='w-4'>
-                <StatusSelect routeId={routeId} clientId={route._id} status={route.status}/>
-              </TableCell>
-            </TableRow>
-          ))
-        ) : (
-          <div></div>
-        )}
+      <TableBody emptyContent='No hay rutas.'>
+        {routes.length > 0
+          ? routes.flatMap(route =>
+              route.clients.map((client: RouteClient) => (
+                <TableRow key={client._id}>
+                  <TableCell>
+                    <Trash2
+                      color='red'
+                      className='cursor-pointer'
+                      onClick={() => handleDeleteClient(route._id, client._id)}
+                    />
+                  </TableCell>
+                  <TableCell>{client.name}</TableCell>
+                  <TableCell>{client.address}</TableCell>
+                  <TableCell className='w-4'>
+                    <StatusSelect
+                      routeId={route._id}
+                      clientId={client._id}
+                      status={client.status}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )
+          : []}
       </TableBody>
     </Table>
-  )
-}
+  );
+};
 
-export default RouteTable
+export default RouteTable;

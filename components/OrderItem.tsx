@@ -29,12 +29,12 @@ interface OrderItemProps {
 }
 
 export default function OrderItem({ order, fetchData }: OrderItemProps) {
-  const totalItems = order.products.length;
   const totalPrice = order.products.reduce((total, product) => {
     const selectedPrice = product.prices[0];
     return total + selectedPrice * product.quantity;
   }, 0);
-
+  console.log(order);
+  
   return (
     <Card className='max-w-[300px]'>
       <CardHeader className='flex items-center justify-center gap-3'>

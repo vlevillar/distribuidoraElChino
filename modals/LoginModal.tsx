@@ -10,6 +10,7 @@ export default function LoginModal({ onLogin }: LoginModalProps) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null); 
 
   const handleLogin = async () => {
     try {
@@ -28,7 +29,7 @@ export default function LoginModal({ onLogin }: LoginModalProps) {
         const loginData = await loginResponse.json();
         const accessToken = loginData.access_token;
   
-        const profileResponse = await fetch('http://localhost:3000/auth/profile', {
+        const profileResponse = await fetch(`${process.env.API_URL}/auth/profile`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -37,17 +38,24 @@ export default function LoginModal({ onLogin }: LoginModalProps) {
 
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
+          localStorage.setItem('username', profileData.username);
           onLogin(profileData.username);
           onClose() 
         } else {
           console.error('Error al obtener el perfil:', profileResponse.statusText);
         }
       } else {
+        setError('Usuario o contraseña incorrectos');
         console.error('Error al iniciar sesión:', loginResponse.statusText);
       }
     } catch (error) {
+      setError('Error en la solicitud de inicio de sesión');
       console.error('Error en la solicitud de inicio de sesión:', error);
     }
+  };
+
+  const clearError = () => {
+    setError(null);
   };
 
   return (
@@ -85,9 +93,14 @@ export default function LoginModal({ onLogin }: LoginModalProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                {error && 
+                <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                <p style={{ color: 'red' }}>{error}</p>
+                </div>
+                }
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
+                <Button color="danger" variant="flat" onPress={() => { onClose(); clearError(); }}>
                   Cerrar
                 </Button>
                 <Button color="primary" onPress={handleLogin}>

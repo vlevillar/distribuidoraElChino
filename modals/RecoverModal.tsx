@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input } from "@nextui-org/react";
 import { Lock, User } from "react-feather";
 
-interface LoginModalProps {
-  onLogin: (username: string) => void;
-}
-
-export default function LoginModal({ onLogin }: LoginModalProps) {
+export default function RecoverModal() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleLogin = async () => {
+  const handleRecover = async () => {
+    setError('');
+    setSuccess('');
     try {
-      const loginResponse = await fetch(`${process.env.API_URL}/auth/login`, {
+      const response = await fetch(`${process.env.API_URL}/auth/recover`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -23,36 +23,26 @@ export default function LoginModal({ onLogin }: LoginModalProps) {
           password
         })
       });
-      
-      if (loginResponse.status === 201) {
-        const loginData = await loginResponse.json();
-        const accessToken = loginData.access_token;
-  
-        const profileResponse = await fetch('http://localhost:3000/auth/profile', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        });
 
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          onLogin(profileData.username);
-          onClose() 
-        } else {
-          console.error('Error al obtener el perfil:', profileResponse.statusText);
-        }
+      if (response.status === 201) {
+        setSuccess('Contraseña actualizada correctamente');
+        setTimeout(() => {
+          setSuccess('');
+          onClose();
+        }, 2000); // Cerrar el modal después de 2 segundos
+      } else if (response.status === 500) {
+        setError('Usuario no encontrado');
       } else {
-        console.error('Error al iniciar sesión:', loginResponse.statusText);
+        setError('Error en la operación');
       }
     } catch (error) {
-      console.error('Error en la solicitud de inicio de sesión:', error);
+      setError('Error en la solicitud de recupero');
     }
   };
 
   return (
     <>
-      <Button onPress={onOpen} color="primary">Ingresar</Button>
+      <Button onPress={onOpen} color="default">Recuperar</Button>
       <Modal 
         isOpen={isOpen} 
         onOpenChange={onOpenChange}
@@ -61,7 +51,7 @@ export default function LoginModal({ onLogin }: LoginModalProps) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Ingresar</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Cambiar</ModalHeader>
               <ModalBody>
                 <Input
                   autoFocus
@@ -85,13 +75,15 @@ export default function LoginModal({ onLogin }: LoginModalProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {success && <p style={{ color: 'green' }}>{success}</p>}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>
                   Cerrar
                 </Button>
-                <Button color="primary" onPress={handleLogin}>
-                  Iniciar sesión
+                <Button color="primary" onPress={handleRecover}>
+                  Cambiar Contraseña
                 </Button>
               </ModalFooter>
             </>

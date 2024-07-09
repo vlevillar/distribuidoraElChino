@@ -12,6 +12,7 @@ import {
 } from '@nextui-org/react';
 import { Unlock } from 'react-feather';
 import RegisterModal from '@/modals/RegisterModal';
+import RecoverModal from '@/modals/RecoverModal';
 
 export default function Home() {
   const [isLogged, setIsLogged] = useState(false);
@@ -45,6 +46,7 @@ export default function Home() {
           <div className='flex justify-between gap-2 py-2'>
             <LoginModal onLogin={handleLogin} />
             <RegisterModal/>
+            <RecoverModal />
           </div>
         )}
       </div>

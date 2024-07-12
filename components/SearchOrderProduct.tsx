@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card, CardHeader, CardBody, Divider, Input, Chip } from '@nextui-org/react';
 import { ShoppingBag } from 'react-feather';
 
@@ -32,44 +32,56 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
         }
         const data: Product[] = await response.json();
         setProducts(data);
-        const initialSelectedChips = data.map(product =>
-          initialProducts?.some(initialProduct => initialProduct._id === product._id) ?? false
-        );
-        setSelectedChips(initialSelectedChips);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
     };
 
     fetchData();
-  }, [initialProducts]);
+  }, []); // Este efecto ahora solo se ejecuta una vez al montar el componente
 
-  const handleChipClick = (index: number) => {
-    setSelectedChips((prevSelectedChips: boolean[]) => {
-      const updatedChips = [...prevSelectedChips];
-      updatedChips[index] = !updatedChips[index];
-      return updatedChips;
-    });
-
-    const selectedProduct = products[index];
-    if (selectedChips[index]) {
-      setSelectedProducts(prevSelectedProducts =>
-        prevSelectedProducts.filter(product => product._id !== selectedProduct._id)
+  useEffect(() => {
+    if (products.length > 0 && initialProducts) {
+      const initialSelectedChips = products.map(product =>
+        initialProducts.some(initialProduct => initialProduct._id === product._id)
       );
-    } else {
-      setSelectedProducts(prevSelectedProducts => [...prevSelectedProducts, selectedProduct]);
+      setSelectedChips(initialSelectedChips);
+      setSelectedProducts(initialProducts);
     }
-  };
+  }, [products, initialProducts]);
+
+  const handleChipClick = useCallback((index: number) => {
+    const selectedProduct = products[index];
+    setSelectedProducts(prevSelectedProducts => {
+      const isProductSelected = prevSelectedProducts.some(product => product._id === selectedProduct._id);
+      if (isProductSelected) {
+        return prevSelectedProducts.filter(product => product._id !== selectedProduct._id);
+      } else {
+        return [...prevSelectedProducts, { ...selectedProduct, quantity: 1 }];
+      }
+    });
+  }, [products, selectedProducts]);
+
+  useEffect(() => {
+    const updatedSelectedChips = products.map(product =>
+      selectedProducts.some(selectedProduct => selectedProduct._id === product._id)
+    );
+    setSelectedChips(updatedSelectedChips);
+  }, [products, selectedProducts]);
 
   useEffect(() => {
     onSelectedProductChange(selectedProducts);
   }, [selectedProducts, onSelectedProductChange]);
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = useMemo(() => {
+    return products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [products, searchTerm]);
 
-  const sortedProducts = filteredProducts.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const sortedProducts = useMemo(() => {
+    return filteredProducts.slice().sort((a, b) => a.name.localeCompare(b.name));
+  }, [filteredProducts]);
 
   return (
     <Card className='max-w-[400px]'>

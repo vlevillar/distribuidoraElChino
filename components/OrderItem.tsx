@@ -10,30 +10,34 @@ import DelOrderModal from '@/modals/DeleteOrderModal';
 import ViewOrderResume from '@/modals/ViewOrderResume';
 import EditOrderModal from '@/modals/EditOrderModal';
 
+interface Product {
+  _id: string;
+  name: string;
+  prices: number[];
+  quantity: number;
+  measurement: string;
+}
+
+interface Order {
+  _id: string;
+  clientName: string;
+  clientId: string;
+  clientNumber: number;
+  products: Product[];
+  discount: string;
+  selectedList: number;
+}
+
 interface OrderItemProps {
-  order: {
-    _id: string;
-    clientName: string;
-    clientId: string;
-    clientNumber: number;
-    products: {
-      _id: string;
-      name: string;
-      prices: number[];
-      quantity: number;
-      measurement: string;
-    }[];
-    discount: string;
-  };
+  order: Order;
   fetchData: () => void;
 }
 
 export default function OrderItem({ order, fetchData }: OrderItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
-    const selectedPrice = product.prices[0];
+    const selectedPrice = product.prices[order.selectedList];
     return total + selectedPrice * product.quantity;
   }, 0);
-  console.log(order);
   
   return (
     <Card className='max-w-[300px]'>
@@ -45,7 +49,7 @@ export default function OrderItem({ order, fetchData }: OrderItemProps) {
       <Divider />
       <CardBody>
         <div className='flex items-center justify-center flex-col'>
-          <ViewOrderResume orderData={order.products}/>
+          <ViewOrderResume orderData={order.products} selectedList={order.selectedList}/>
           <p>Total: ${totalPrice.toFixed(2)}</p>
         </div>
       </CardBody>

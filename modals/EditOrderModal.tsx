@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   ModalContent,
@@ -8,20 +8,20 @@ import {
   Button,
   useDisclosure,
   Input
-} from '@nextui-org/react'
-import { Percent } from 'react-feather'
-import SearchOrderClient from '@/components/SearchOrderClient'
-import SearchOrderProduct from '@/components/SearchOrderProduct'
-import ListTabs from '@/components/ListTabs'
-import EditOrderResume from '@/components/EditOrderResume'
+} from '@nextui-org/react';
+import { Percent } from 'react-feather';
+import SearchOrderClient from '@/components/SearchOrderClient';
+import SearchOrderProduct from '@/components/SearchOrderProduct';
+import ListTabs from '@/components/ListTabs';
+import EditOrderResume from '@/components/EditOrderResume';
 
 interface Client {
-  _id: string
+  _id: string;
   clientNumber: number;
-  name: string
-  address: string
-  type: string
-  phone: string
+  name: string;
+  address: string;
+  type: string;
+  phone: string;
 }
 
 interface Product {
@@ -30,8 +30,8 @@ interface Product {
   name: string;
   prices: number[];
   quantity: number;
-  selectedMeasurement?: string; 
-  selectedPrice?: number; 
+  selectedMeasurement?: string;
+  selectedPrice?: number;
 }
 
 interface Order {
@@ -41,6 +41,7 @@ interface Order {
   clientNumber: number;
   products: Product[];
   discount: string;
+  selectedList: number;
 }
 
 interface EditOrderModalProps {
@@ -49,84 +50,103 @@ interface EditOrderModalProps {
 }
 
 const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => {
-  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure()
-  const [percent, setPercent] = useState<any[]>([])
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
-  const [selected, setSelected] = useState(0)
-  const [products, setProducts] = useState<Product[]>([])
-  const [discount, setDiscount] = useState('')
-  const [total, setTotal] = useState(0)
-  const [totalWithDiscount, setTotalWithDiscount] = useState(0)
-console.log(percent);
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [percent, setPercent] = useState<any[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [selected, setSelected] = useState(0);
+  const [discount, setDiscount] = useState('');
+  const [total, setTotal] = useState(0);
+  const [totalWithDiscount, setTotalWithDiscount] = useState(0);
+
+  console.log('selectedProducts:', selectedProducts);
+
+  const memoizedSelectedProducts = useMemo(() => selectedProducts, [selectedProducts.map(p => p._id).join(',')]);
 
   useEffect(() => {
-    getPricesList()
-  }, [])
+    getPricesList();
+  }, []);
 
   useEffect(() => {
-    setSelectedClient({
-      _id: order.clientId,
-      clientNumber: order.clientNumber,
-      name: order.clientName,
-      address: '',
-      type: '',
-      phone: ''
-    })
-    setSelectedProducts(order.products)
-    setDiscount(order.discount)
-    calculateTotalWithDiscount()
-  }, [order])
+    if (order) {
+      setSelectedClient({
+        _id: order.clientId,
+        clientNumber: order.clientNumber,
+        name: order.clientName,
+        address: '',
+        type: '',
+        phone: ''
+      });
+      setSelectedProducts(order.products);
+      setDiscount(order.discount);
+      calculateTotalWithDiscount();
+    }
+  }, [order]);
 
   useEffect(() => {
-    calculateTotalWithDiscount()
-  }, [total, discount])
+    if (order) {
+      setSelectedProducts(order.products);
+    }
+  }, [order]); 
+  
+
+  useEffect(() => {
+    calculateTotalWithDiscount();
+  }, [total, discount]);
 
   const getPricesList = async () => {
     try {
-      const response = await fetch(
-        `${process.env.API_URL}/pricesList`,
-        {
-          method: 'GET'
-        }
-      )
+      const response = await fetch(`${process.env.API_URL}/pricesList`, {
+        method: 'GET'
+      });
       if (response.ok) {
-        console.log('Datos de precios obtenidos exitosamente')
-        const data = await response.json()
-        setPercent(data)
+        console.log('Datos de precios obtenidos exitosamente');
+        const data = await response.json();
+        setPercent(data);
       } else {
-        console.error('Error al obtener datos de precios')
+        console.error('Error al obtener datos de precios');
       }
     } catch (error) {
-      console.error('Error al obtener datos de precios:', error)
+      console.error('Error al obtener datos de precios:', error);
     }
-  }
+  };
 
   const handleSelectedClientChange = (clients: Client[]) => {
-    setSelectedClient(clients.length > 0 ? clients[0] : null)
-  }
+    setSelectedClient(clients.length > 0 ? clients[0] : null);
+  };
 
-  const handleSelectedProductChange = (products: Product[]) => {
-    setSelectedProducts(products)
-  }
+  const handleProductsChange = (updatedProducts: Product[]) => {
+    console.log('Updating products:', updatedProducts);
+    setSelectedProducts(updatedProducts);
+  };
+
+  const handleSelectedProductSearchChange = useCallback((products: Product[]) => {
+    setSelectedProducts(prevProducts => {
+      return products.map(newProduct => {
+        const existingProduct = prevProducts.find(p => p._id === newProduct._id);
+        return existingProduct ? { ...newProduct, quantity: existingProduct.quantity } : { ...newProduct, quantity: 1 };
+      });
+    });
+  }, []);
 
   const handleSelectionChange = (key: any) => {
-    setSelected(key)
-  }
+    console.log('Setting selected from ListTabs:', key);
+    setSelected(key);
+  };
 
   const handleTotalChange = (total: number) => {
-    setTotal(total)
-  }
+    setTotal(total);
+  };
 
   const calculateTotalWithDiscount = () => {
-    const discountValue = parseFloat(discount)
+    const discountValue = parseFloat(discount);
     if (!isNaN(discountValue)) {
-      const newTotal = total - total * (discountValue / 100)
-      setTotalWithDiscount(newTotal)
+      const newTotal = total - total * (discountValue / 100);
+      setTotalWithDiscount(newTotal);
     } else {
-      setTotalWithDiscount(total)
+      setTotalWithDiscount(total);
     }
-  }
+  };
 
   const handleUpdateOrder = async () => {
     if (!selectedClient || selectedProducts.length === 0) {
@@ -145,10 +165,11 @@ console.log(percent);
       clientNumber: selectedClient.clientNumber,
       products: transformedProducts,
       discount: discount,
+      selectedList: Number(selected)
     };
 
     try {
-      const response = await fetch(`${process.env.API_URL}/pricesList/orders/${order._id}`, {
+      const response = await fetch(`${process.env.API_URL}/orders/${order._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -158,8 +179,8 @@ console.log(percent);
 
       if (response.ok) {
         console.log('Order updated successfully');
-        onClose()
-        onSuccess()
+        onClose();
+        onSuccess();
       } else {
         console.error('Error updating order');
       }
@@ -185,25 +206,32 @@ console.log(percent);
                 Editar pedido
               </ModalHeader>
               <ModalBody>
+                <div className='flex-col'>
                 <SearchOrderClient
                   onSelectedClientsChange={handleSelectedClientChange}
                   initialClient={selectedClient}
                 />
+                    </div>
+                <div className='flex-col'>
                 <SearchOrderProduct
-                  onSelectedProductChange={handleSelectedProductChange}
-                  initialProducts={selectedProducts}
+                  onSelectedProductChange={handleSelectedProductSearchChange}
+                  initialProducts={memoizedSelectedProducts}
                 />
+                </div>
+                <div className='flex-row'>
+                <p className='py-2'>Seleccione la lista:</p>
                 <ListTabs
                   handle={handleSelectionChange}
                   selected={selected}
                   list={percent}
                 />
-                {/* <EditOrderResume
+                </div>
+                <EditOrderResume
                   selectedProducts={selectedProducts}
                   selectedList={selected}
                   onTotalChange={handleTotalChange}
-                  setProducts={setProducts}
-                /> */}
+                  onProductsChange={handleProductsChange}
+                />
                 <div className='flex justify-end'>
                   <div>
                     <Input
@@ -238,7 +266,7 @@ console.log(percent);
         </ModalContent>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default EditOrderModal
+export default EditOrderModal;

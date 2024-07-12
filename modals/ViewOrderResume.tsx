@@ -20,18 +20,17 @@ interface Product {
   name: string;
   prices: number[];
   quantity: number;
-  selectedMeasurement?: string;
-  selectedPrice?: number;
+  measurement: string;
 }
 
 interface ViewOrderResumeProps {
   orderData: Product[];
+  selectedList: number; // Agrega selectedList aquí
 }
 
-const ViewOrderResume: React.FC<ViewOrderResumeProps> = ({ orderData }) => {
+const ViewOrderResume: React.FC<ViewOrderResumeProps> = ({ orderData, selectedList }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-console.log(orderData);
-
+  
   return (
     <>
       <Button onPress={onOpen} size='sm' variant='light'>
@@ -54,15 +53,18 @@ console.log(orderData);
                     <TableColumn>Total</TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {orderData.map((product) => (
-                      <TableRow key={product._id}>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>{product.quantity}</TableCell>
-                        <TableCell>{product.selectedMeasurement}</TableCell>
-                        <TableCell>{product.selectedPrice?.toFixed(2)}</TableCell>
-                        <TableCell>{(product.selectedPrice! * product.quantity).toFixed(2)}</TableCell>
-                      </TableRow>
-                    ))}
+                  {orderData.map((product) => {
+                      const measurement = product.measurement === 'unit' ? 'U.' : 'Kg.';
+                      return (
+                        <TableRow key={product._id}>
+                          <TableCell>{product.name}</TableCell>
+                          <TableCell>{product.quantity}</TableCell>
+                          <TableCell>{measurement}</TableCell>
+                          <TableCell>{product.prices[selectedList]?.toFixed(2)}</TableCell>
+                          <TableCell>{(product.prices[selectedList] * product.quantity).toFixed(2)}</TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </ModalBody>

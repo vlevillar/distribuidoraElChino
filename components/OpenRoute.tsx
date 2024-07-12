@@ -26,33 +26,50 @@ interface Route {
   _id: string
 }
 
-const OpenRoute: React.FC = () => {
+interface OpenRouteProps {
+  isLogged: boolean
+  userId: string | null
+}
+
+const OpenRoute: React.FC<OpenRouteProps> = ({ isLogged, userId }) => {
   const [routeData, setRouteData] = useState<Route | null>(null)
   const [date, setDate] = useState<string | null>(null)
 
   useEffect(() => {
-    const storedRoute = localStorage.getItem('openRoute')
-    if (storedRoute) {
-      setDate(storedRoute)
+    const fetchUserData = async () => {
+      if (isLogged && userId) {
+        try {
+          const response = await fetch(`${process.env.API_URL}/user/${userId}`)
+          if (response.ok) {
+            const userData = await response.json()
+            setDate(userData.selectedDate)
+            localStorage.setItem('openRoute', userData.selectedDate)
+          } else {
+            console.error(
+              'Error al obtener datos del usuario:',
+              response.statusText
+            )
+          }
+        } catch (error) {
+          console.error('Error en la solicitud de datos del usuario:', error)
+        }
+      } else {
+        setDate(null)
+        setRouteData(null)
+        localStorage.removeItem('openRoute')
+      }
     }
-  }, [])
 
-  const formatDate = (dateString: string | null): string | null => {
-    if (!dateString) return null
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-  }
+    fetchUserData()
+  }, [isLogged, userId])
 
   useEffect(() => {
     if (!date) return
 
-    const dateFormatted = formatDate(date)
-    console.log(dateFormatted)
-
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${process.env.API_URL}/routes?date=${dateFormatted}`,
+          `${process.env.API_URL}/routes?date=${date}`,
           {
             method: 'GET',
             headers: {
@@ -75,13 +92,19 @@ const OpenRoute: React.FC = () => {
     fetchData()
   }, [date])
 
+  const formatDate = (dateString: string | null): string => {
+    if (!dateString) return ''
+    const [year, month, day] = dateString.split('-')
+    return `${day}/${month}/${year}`
+  }
+
   return (
     <Table
       isStriped
       aria-label='Tabla de Ruta Abierta'
       topContent={
         <div className='flex items-center justify-center gap-2'>
-          <Unlock size={18} /> <p>Ruta abierta: {date}</p>
+          <Unlock size={18} /> <p>Ruta abierta: {formatDate(date)}</p>
         </div>
       }
     >
@@ -91,7 +114,13 @@ const OpenRoute: React.FC = () => {
         <TableColumn>Teléfono</TableColumn>
         <TableColumn>Estado</TableColumn>
       </TableHeader>
-      <TableBody emptyContent='No hay rutas abiertas.'>
+      <TableBody
+        emptyContent={
+          date
+            ? 'No hay clientes en la ruta abierta.'
+            : 'No hay rutas abiertas.'
+        }
+      >
         {routeData?.clients.map((client: RouteClient) => (
           <TableRow key={client._id}>
             <TableCell className='w-[25%]'>{client.name}</TableCell>

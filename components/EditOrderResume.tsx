@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'react'
 import {
   Button,
   Dropdown,
@@ -12,80 +12,100 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  Selection,
-} from '@nextui-org/react';
+  Selection
+} from '@nextui-org/react'
 
 interface Product {
-  _id: string;
-  code?: string;
-  name: string;
-  prices: number[];
-  quantity: number;
-  selectedMeasurement?: string; 
-  selectedPrice?: number; 
+  _id: string
+  code?: string
+  name: string
+  prices: number[]
+  quantity: number
+  selectedMeasurement?: string
+  selectedPrice?: number
 }
 
 interface EditOrderResumeProps {
-  selectedProducts: Product[];
-  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-  selectedList: number;
-  onTotalChange: (total: number) => void;
+  selectedProducts: Product[]
+  selectedList: number
+  onProductsChange: (updatedProducts: Product[]) => void
+  onTotalChange: (total: number) => void
 }
 
-const EditOrderResume: React.FC<EditOrderResumeProps> = ({ selectedProducts, selectedList, onTotalChange, setProducts }) => {
-  const [selectedKeys, setSelectedKeys] = React.useState<{ [key: string]: Selection }>({});
-  const [quantities, setQuantities] = React.useState<{ [key: string]: string }>({});
-
-  useEffect(() => {
-    const initialQuantities: { [key: string]: string } = {};
-    selectedProducts.forEach(product => {
-      initialQuantities[product._id] = String(product.quantity);
-    });
-    setQuantities(initialQuantities);
-  }, [selectedProducts]);
-
-  const handleQuantityChange = (id: string, value: string) => {
-    setQuantities(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleSelectionChange = (id: string, keys: Selection) => {
-    setSelectedKeys(prev => ({ ...prev, [id]: keys }));
-  };
-
-  const getSelectedValue = (id: string) => {
-    return Array.from(selectedKeys[id] || new Set(['Kg.'])).join(', ').replaceAll('_', ' ');
-  };
+const EditOrderResume: React.FC<EditOrderResumeProps> = ({
+  selectedProducts,
+  selectedList,
+  onTotalChange,
+  onProductsChange
+}) => {
+  const [selectedKeys, setSelectedKeys] = React.useState<{
+    [key: string]: Selection
+  }>({})
+  const [quantities, setQuantities] = React.useState<{ [key: string]: string }>(
+    {}
+  )
 
   useEffect(() => {
     const total = selectedProducts.reduce((sum, product) => {
-      const quantity = Number(quantities[product._id] || product.quantity);
-      const price = product.prices[selectedList];
-      return sum + price * quantity;
-    }, 0);
-    onTotalChange(total);
-  }, [selectedProducts, selectedList, quantities, onTotalChange]);
-  
+      const quantity = Number(quantities[product._id] || product.quantity)
+      const price = product.prices[selectedList]
+      return sum + price * quantity
+    }, 0)
+    onTotalChange(total)
+  }, [selectedProducts, quantities, selectedList, onTotalChange])
+
   useEffect(() => {
     const mergedArray = selectedProducts.map(product => {
-      const selectedKey = Array.from(selectedKeys[product._id] || new Set(['Kg.']))[0]; 
-      const selectedKeyString = String(selectedKey); 
+      const selectedKey = Array.from(
+        selectedKeys[product._id] || new Set(['Kg.'])
+      )[0]
+      const selectedKeyString = String(selectedKey)
 
-      const selectedMeasurement = selectedKeyString === 'Kg.' ? 'kilogram' : 'unit';
+      const selectedMeasurement =
+        selectedKeyString === 'Kg.' ? 'kilogram' : 'unit'
 
-      const pxkg = product.prices[selectedList];
-    
+      const pxkg = product.prices[selectedList]
+
       return {
         ...product,
         selectedMeasurement,
         quantity: Number(quantities[product._id] || product.quantity),
         selectedPrice: pxkg
-      };
-    });
+      }
+    })
 
-    setProducts(mergedArray);
-  }, [selectedProducts, selectedKeys, quantities, selectedList, setProducts]);
+  }, [selectedProducts, selectedKeys, quantities, selectedList])
 
-  
+  useEffect(() => {
+    const initialQuantities: { [key: string]: string } = {}
+    selectedProducts.forEach(product => {
+      initialQuantities[product._id] = String(product.quantity)
+    })
+    setQuantities(initialQuantities)
+  }, [selectedProducts])
+
+  const handleQuantityChange = (id: string, value: string) => {
+    console.log('Changing quantity:', id, value)
+    const numValue = Number(value)
+    if (!isNaN(numValue)) {
+      const updatedProducts = selectedProducts.map(product =>
+        product._id === id ? { ...product, quantity: numValue } : product
+      )
+      setQuantities(prevQuantities => ({ ...prevQuantities, [id]: value })) // Actualiza las cantidades
+      onProductsChange(updatedProducts)
+    }
+  }
+
+  const handleSelectionChange = (id: string, keys: Selection) => {
+    setSelectedKeys(prev => ({ ...prev, [id]: keys }))
+  }
+
+  const getSelectedValue = (id: string) => {
+    return Array.from(selectedKeys[id] || new Set(['Kg.']))
+      .join(', ')
+      .replaceAll('_', ' ')
+  }
+
   return (
     <Table removeWrapper aria-label='Example static collection table'>
       <TableHeader>
@@ -96,7 +116,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({ selectedProducts, sel
         <TableColumn>Total</TableColumn>
       </TableHeader>
       <TableBody>
-        {selectedProducts?.map((product) => (
+        {selectedProducts?.map(product => (
           <TableRow key={product._id}>
             <TableCell>{product.name}</TableCell>
             <TableCell>
@@ -104,8 +124,10 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({ selectedProducts, sel
                 placeholder='0.00'
                 variant='underlined'
                 type='number'
-                onChange={(e) => handleQuantityChange(product._id, e.target.value)}
-                defaultValue={String(product.quantity)}
+                onChange={e =>
+                  handleQuantityChange(product._id, e.target.value)
+                }
+                value={String(product.quantity)}
               />
             </TableCell>
             <TableCell>
@@ -121,7 +143,9 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({ selectedProducts, sel
                   disallowEmptySelection
                   selectionMode='single'
                   selectedKeys={selectedKeys[product._id] || new Set(['Kg.'])}
-                  onSelectionChange={(keys: Selection) => handleSelectionChange(product._id, keys)}
+                  onSelectionChange={(keys: Selection) =>
+                    handleSelectionChange(product._id, keys)
+                  }
                 >
                   <DropdownItem key='Kg.'>KG</DropdownItem>
                   <DropdownItem key='U.'>U.</DropdownItem>
@@ -129,12 +153,17 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({ selectedProducts, sel
               </Dropdown>
             </TableCell>
             <TableCell>{product.prices[selectedList].toFixed(2)}</TableCell>
-            <TableCell>{(product.prices[selectedList] * Number(quantities[product._id] || product.quantity)).toFixed(2)}</TableCell>
+            <TableCell>
+              {(
+                product.prices[selectedList] *
+                Number(quantities[product._id] || product.quantity)
+              ).toFixed(2)}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  );
-};
+  )
+}
 
-export default EditOrderResume;
+export default EditOrderResume

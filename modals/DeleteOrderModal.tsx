@@ -22,7 +22,7 @@ const DelOrderModal: React.FC<Props> = ({ name, id, fetchData }) => {
   const handleDeleteOrder = async () => {
     try {
       const response = await fetch(
-        `${process.env.API_URL}/pricesList/orders/${id}`,
+        `${process.env.API_URL}/orders/${id}`,
         {
           method: 'DELETE',
           headers: {

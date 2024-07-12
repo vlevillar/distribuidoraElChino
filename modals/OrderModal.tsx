@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 import {
   Modal,
   ModalContent,
@@ -9,7 +9,7 @@ import {
   useDisclosure,
   Input
 } from '@nextui-org/react'
-import { Percent, PlusCircle } from 'react-feather'
+import { Calendar, Percent, PlusCircle } from 'react-feather'
 import SearchOrderClient from '@/components/SearchOrderClient'
 import SearchOrderProduct from '@/components/SearchOrderProduct'
 import OrderResume from '@/components/OrderResume'
@@ -17,7 +17,7 @@ import ListTabs from '@/components/ListTabs'
 
 interface Client {
   _id: string
-  clientNumber: number;
+  clientNumber: number
   name: string
   address: string
   type: string
@@ -25,17 +25,17 @@ interface Client {
 }
 
 interface Product {
-  _id: string;
-  code?: string;
-  name: string;
-  prices: number[];
-  quantity: number;
-  selectedMeasurement?: string; 
-  selectedPrice?: number; 
+  _id: string
+  code?: string
+  name: string
+  prices: number[]
+  quantity: number
+  selectedMeasurement?: string
+  selectedPrice?: number
 }
 
 interface OrderModalProps {
-  onSuccess: () => void;
+  onSuccess: () => void
 }
 
 export default function OrderModal({ onSuccess }: OrderModalProps) {
@@ -44,7 +44,6 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
   const [selected, setSelected] = useState(0)
-  const [products, setProducts] = useState<Product[]>([])
   const [discount, setDiscount] = useState('')
   const [total, setTotal] = useState(0)
   const [totalWithDiscount, setTotalWithDiscount] = useState(0)
@@ -55,16 +54,13 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
 
   useEffect(() => {
     calculateTotalWithDiscount()
-  }, [total, discount])
+  }, [])
 
   const getPricesList = async () => {
     try {
-      const response = await fetch(
-        `${process.env.API_URL}/pricesList`,
-        {
-          method: 'GET'
-        }
-      )
+      const response = await fetch(`${process.env.API_URL}/pricesList`, {
+        method: 'GET'
+      })
       if (response.ok) {
         console.log('Datos de precios obtenidos exitosamente')
         const data = await response.json()
@@ -81,9 +77,19 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     setSelectedClient(clients.length > 0 ? clients[0] : null)
   }
 
-  const handleSelectedProductChange = (products: Product[]) => {
-    setSelectedProducts(products)
-  }
+  const handleSelectedProductChange = (newProducts: Product[]) => {
+    setSelectedProducts(prevProducts => {
+      return newProducts.map(newProduct => {
+        const existingProduct = prevProducts.find(p => p._id === newProduct._id);
+        return existingProduct ? { ...newProduct, quantity: existingProduct.quantity } : newProduct;
+      });
+    });
+  };
+
+  const handleProductsChange = (updatedProducts: Product[]) => {
+    console.log('Updating products:', updatedProducts);
+    setSelectedProducts(updatedProducts);
+  };
 
   const handleClose = () => {
     setSelectedClient(null)
@@ -110,17 +116,19 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       setTotalWithDiscount(total)
     }
   }
+console.log('selected: ',selectedProducts);
 
   const handleCreateOrder = async () => {
     if (!selectedClient || selectedProducts.length === 0) {
-      console.error('Client or products not selected');
-      return;
+      console.error('Client or products not selected')
+      return
     }
 
     const transformedProducts = selectedProducts.map(product => ({
       ...product,
+      quantity: product.quantity,
       code: String(product.code)
-    }));
+    }))
 
     const orderData = {
       clientId: selectedClient._id,
@@ -128,7 +136,8 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       clientNumber: selectedClient.clientNumber,
       products: transformedProducts,
       discount: discount,
-    };
+      selectedList: Number(selected)
+    }
 
     try {
       const response = await fetch(`${process.env.API_URL}/orders`, {
@@ -137,20 +146,20 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(orderData)
-      });
+      })
 
       if (response.ok) {
-        console.log('Order created successfully');
+        console.log('Order created successfully')
         onClose()
         onSuccess()
-        handleClose();
+        handleClose()
       } else {
-        console.error('Error creating order');
+        console.error('Error creating order')
       }
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error('Error creating order:', error)
     }
-  };
+  }
 
   return (
     <>
@@ -176,16 +185,18 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                 <SearchOrderProduct
                   onSelectedProductChange={handleSelectedProductChange}
                 />
-                <ListTabs
-                  handle={handleSelectionChange}
-                  selected={selected}
-                  list={percent}
-                />
+                <div className='flex justify-between z-10'>
+                  <ListTabs
+                    handle={handleSelectionChange}
+                    selected={selected}
+                    list={percent}
+                  />
+                </div>
                 <OrderResume
                   selectedProducts={selectedProducts}
                   selectedList={selected}
                   onTotalChange={handleTotalChange}
-                  setProducts={setProducts}
+                  onProductsChange={handleProductsChange}
                 />
                 <div className='flex justify-end'>
                   <div>
@@ -199,7 +210,9 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                     />
                     <p>Subtotal: $ {total.toFixed(2)}</p>
                     {discount ? <p>Descuento: {discount}%</p> : null}
-                    <p>Total: <b>$ {totalWithDiscount.toFixed(2)}</b></p>
+                    <p>
+                      Total: <b>$ {totalWithDiscount.toFixed(2)}</b>
+                    </p>
                   </div>
                 </div>
               </ModalBody>
@@ -207,8 +220,8 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                 <Button color='danger' variant='flat' onPress={onClose}>
                   Cerrar
                 </Button>
-                <Button 
-                  color='success' 
+                <Button
+                  color='success'
                   onPress={handleCreateOrder}
                   isDisabled={total === 0}
                 >

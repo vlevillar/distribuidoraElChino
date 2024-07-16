@@ -27,7 +27,7 @@ const DelProductModal: React.FC<Props> = ({ name, id, fetchData }) => {
         return;
       }
       const response = await fetch(
-        `${process.env.API_URL}/pricesList/products/${id}`,
+        `${process.env.API_URL}/products/${id}`,
         {
           method: 'DELETE',
           headers: {

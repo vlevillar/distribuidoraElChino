@@ -22,9 +22,15 @@ const DelRoute: React.FC<Props> = ({ currentDate, routeId, disabled, onDeleteSuc
 
   const handleDeleteRoute = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       if (routeId) {
         const response = await fetch(`${process.env.API_URL}/routes/${routeId}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers:{'Authorization': `Bearer ${accessToken}`}
         });
         if (response.ok) {
           console.log('Ruta eliminada exitosamente');

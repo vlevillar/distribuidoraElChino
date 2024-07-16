@@ -39,7 +39,16 @@ const OpenRoute: React.FC<OpenRouteProps> = ({ isLogged, userId }) => {
     const fetchUserData = async () => {
       if (isLogged && userId) {
         try {
-          const response = await fetch(`${process.env.API_URL}/user/${userId}`)
+          const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.error('No se encontró el token de acceso');
+          return;
+        }
+          const response = await fetch(`${process.env.API_URL}/user/${userId}`, {
+            headers: {
+              'Authorization':  `Bearer ${accessToken}`,
+            }
+          })
           if (response.ok) {
             const userData = await response.json()
             setDate(userData.selectedDate)
@@ -68,19 +77,26 @@ const OpenRoute: React.FC<OpenRouteProps> = ({ isLogged, userId }) => {
 
     const fetchData = async () => {
       try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.error('No se encontró el token de acceso');
+          return;
+        }
+    
         const response = await fetch(
           `${process.env.API_URL}/routes?date=${date}`,
           {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
             }
           }
         )
-
+    
         if (response.ok) {
           const data: Route[] = await response.json()
-          setRouteData(data[0] || null) // Asumiendo que data es un array y solo necesitas el primer elemento
+          setRouteData(data[0] || null)
         } else {
           console.error('Error al obtener datos:', response.statusText)
         }
@@ -88,7 +104,6 @@ const OpenRoute: React.FC<OpenRouteProps> = ({ isLogged, userId }) => {
         console.error('Error en la solicitud de datos:', error)
       }
     }
-
     fetchData()
   }, [date])
 

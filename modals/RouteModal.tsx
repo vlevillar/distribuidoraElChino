@@ -36,13 +36,19 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
 
   const crearCliente = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const response = await fetch(
         `${process.env.API_URL}/routes`,
         {
           method: 'POST',
           headers: {
             admin: 'true',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
           },
           body: JSON.stringify({
             clients: selectedClients,

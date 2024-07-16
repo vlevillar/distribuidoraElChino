@@ -1,19 +1,19 @@
-'use client'
-
 import DelProductModal from '@/modals/DeleteProductModal';
 import EditProduct from '@/modals/EditProduct';
-import { Button, Card, CardBody, CardFooter, CardHeader, Divider } from '@nextui-org/react'
-import { Edit, Trash } from 'react-feather'
+import { Card, CardBody, CardFooter, CardHeader, Divider } from '@nextui-org/react'
 
 interface ProductItemProps {
     id: string;
     price: string;
     name: string;
-    fetchData: () => void
+    fetchData: () => void;
+    isAdmin: boolean;
   }
   
-export default function ProductItem( { price, name, id, fetchData }: ProductItemProps ) {
+export default function ProductItem( { price, name, id, fetchData, isAdmin }: ProductItemProps ) {
     const product = { _id: id, name, price }
+    console.log('esadmin', isAdmin);
+    
     return (
         <Card className="max-w-[300px]">
             <CardHeader className="flex gap-3 items-center justify-center">

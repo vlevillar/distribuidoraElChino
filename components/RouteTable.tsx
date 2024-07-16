@@ -37,7 +37,6 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
   const [routes, setRoutes] = useState<Route[]>([])
   const [disabled, setDisabled] = useState(false)
   const [routeId, setRouteId] = useState('')
-  const [openRoute, setOpenRoute] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
   const [isOpenRoute, setIsOpenRoute] = useState<boolean | null>(null)
 
@@ -49,17 +48,22 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
 
   const getData = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const dateFormatted = formatDate(date)
       if (!dateFormatted) {
         console.error('Fecha no válida')
         return
       }
 
-      // Obtener rutas
       const routesResponse = await fetch(
         `${process.env.API_URL}/routes?date=${dateFormatted}`,
         {
-          method: 'GET'
+          method: 'GET',
+          headers:{'Authorization': `Bearer ${accessToken}`}
         }
       )
 
@@ -74,7 +78,6 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
         setDisabled(false)
       }
 
-      // Obtener información del usuario
       const userId = localStorage.getItem('userId')
       if (userId) {
         const userResponse = await fetch(
@@ -105,10 +108,16 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
 
   const handleDeleteClient = async (routeId: string, clientId: string) => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const response = await fetch(
         `${process.env.API_URL}/routes/${routeId}/${clientId}`,
         {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers:{'Authorization': `Bearer ${accessToken}`}
         }
       )
       if (response.ok) {
@@ -157,10 +166,16 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
 
   const handleCloseRoute = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const response = await fetch(
         `${process.env.API_URL}/user/${username}/selectedDate`,
         {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers:{'Authorization': `Bearer ${accessToken}`}
         }
       )
       if (response.ok) {

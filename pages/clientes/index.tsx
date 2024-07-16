@@ -21,7 +21,16 @@ const Productos: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/clients`);
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
+      const response = await fetch(`${process.env.API_URL}/clients`,{
+        headers:{
+          'Authorization': `Bearer ${accessToken}`,
+        }
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch clients");
       }
@@ -34,7 +43,6 @@ const Productos: React.FC = () => {
 
   console.log(clients);
 
-  // Ordenar la lista de clientes por clientNumber
   const sortedClients = [...clients].sort((a, b) => a.clientNumber - b.clientNumber);
 
   return (

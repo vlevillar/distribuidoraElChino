@@ -18,6 +18,7 @@ interface Order {
   date: string;
   documentNumber: number;
   type: string;
+  selectedList: number;
 }
 
 const Pedidos = () => {
@@ -25,8 +26,16 @@ const Pedidos = () => {
 
   const fetchOrders = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const response = await fetch(`${process.env.API_URL}/orders`, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
       });
       if (response.ok) {
         const data = await response.json();

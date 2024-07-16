@@ -28,18 +28,24 @@ const StatusSelect: React.FC<Props> = ({ routeId, clientId, status }) => {
   };
 
   const handleSelectionChange = (keys: Set<string>) => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso');
+      return;
+    }
     setSelectedKeys(keys);
     const statusMap: { [key: string]: string } = {
       'venta': 'VISITED',
       'no_venta': 'UNSOLD',
       'no_visita': 'NOT_VISITED'
     };
-    const status: string = statusMap[Array.from(keys)[0]] || 'NOT_VISITED'; // Default to 'NOT_VISITED'
+    const status: string = statusMap[Array.from(keys)[0]] || 'NOT_VISITED';
     if (routeId && clientId && status) {
       // Perform PUT request here
       fetch(`${process.env.API_URL}/routes`, {
         method: 'PUT',
         headers: {
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({

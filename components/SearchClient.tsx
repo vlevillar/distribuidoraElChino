@@ -31,8 +31,18 @@ export default function SearchClient({ onSelectedClientsChange }: SearchClientPr
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.error('No se encontró el token de acceso');
+          return;
+        }
         const response = await fetch(
-          `${process.env.API_URL}/clients`
+          `${process.env.API_URL}/clients`,
+          {
+            headers:{
+              'Authorization': `Bearer ${accessToken}`
+            }
+          }
         )
         if (!response.ok) {
           throw new Error('Failed to fetch clients')

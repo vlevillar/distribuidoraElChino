@@ -54,12 +54,18 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
 
   useEffect(() => {
     calculateTotalWithDiscount()
-  }, [])
+  }, [total, discount])
 
   const getPricesList = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const response = await fetch(`${process.env.API_URL}/pricesList`, {
-        method: 'GET'
+        method: 'GET',
+        headers:{'Authorization': `Bearer ${accessToken}`}
       })
       if (response.ok) {
         console.log('Datos de precios obtenidos exitosamente')
@@ -119,6 +125,11 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
 console.log('selected: ',selectedProducts);
 
   const handleCreateOrder = async () => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso');
+      return;
+    }
     if (!selectedClient || selectedProducts.length === 0) {
       console.error('Client or products not selected')
       return
@@ -143,7 +154,8 @@ console.log('selected: ',selectedProducts);
       const response = await fetch(`${process.env.API_URL}/orders`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
         },
         body: JSON.stringify(orderData)
       })

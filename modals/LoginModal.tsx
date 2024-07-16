@@ -52,10 +52,11 @@ export default function LoginModal({ onLogin, setUserId }: LoginModalProps) {
         if (profileResponse.ok) {
           const profileData = await profileResponse.json()
           console.log(profileData)
-          setUserId(profileData.userId)
-          localStorage.setItem('userId', profileData.userId)
+          setUserId(profileData.id)
+          localStorage.setItem('userId', profileData.id)
+          localStorage.setItem('accessToken', accessToken)
           localStorage.setItem('username', profileData.username)
-          onLogin(profileData.username, profileData.userId)
+          onLogin(profileData.username, profileData.id)
           onClose()
         } else {
           console.error(

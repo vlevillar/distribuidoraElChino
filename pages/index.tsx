@@ -9,7 +9,9 @@ export default function Home() {
   const [isLogged, setIsLogged] = useState(false)
   const [userProfile, setUserProfile] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [role, setRole] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const authEvent = new Event('authStateChanged');
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username')
@@ -30,6 +32,8 @@ export default function Home() {
       }
       const userData = await response.json()
       setSelectedDate(userData.selectedDate)
+      setRole(userData.role)
+      localStorage.setItem('role', userData.role)
     } catch (error) {
       console.error('Error:', error)
     }
@@ -42,6 +46,7 @@ export default function Home() {
     localStorage.setItem('username', profile)
     localStorage.setItem('userId', newUserId)
     fetchUserData(newUserId)
+    document.dispatchEvent(authEvent);
   }
 
   const handleLogout = () => {
@@ -49,9 +54,13 @@ export default function Home() {
     setUserProfile(null)
     setUserId(null)
     setSelectedDate(null)
+    setRole(null)
     localStorage.removeItem('username')
+    localStorage.removeItem('role')
     localStorage.removeItem('userId')
     localStorage.removeItem('openroute')
+    localStorage.removeItem('accessToken')
+    document.dispatchEvent(authEvent)
   }
 
   return (

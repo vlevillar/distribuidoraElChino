@@ -37,12 +37,18 @@ export default function ProductModal( { onProductCreated } : { onProductCreated:
 
   const createProduct = async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const response = await fetch(
         `${process.env.API_URL}/products`,
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
           },
           body: JSON.stringify({
             name: name,

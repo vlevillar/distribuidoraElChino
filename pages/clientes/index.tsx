@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ClientItem from "@/components/ClientItem";
 import ClientModal from "@/modals/ClientModal";
+import { useRouter } from "next/router";
 
 interface Client {
   _id: string;
@@ -14,9 +15,15 @@ interface Client {
 
 const Productos: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
-
+  const router = useRouter()
   useEffect(() => {
     fetchData();
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso');
+      router.push("/")
+      return;
+    }
   }, []);
 
   const fetchData = async () => {

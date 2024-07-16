@@ -3,18 +3,26 @@ import { Tab, Tabs } from "@nextui-org/react";
 import ProductModal from "@/modals/ProductModal";
 import React, { useEffect, useState } from "react";
 import ListTabs from "@/components/ListTabs";
+import { useRouter } from "next/router";
 
 const Productos = () => {
   const [selected, setSelected] = useState(1);
   const [percent, setPercent] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = React.useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const admin = localStorage.getItem('role')
     getPricesList();
     getProducts();
     setIsAdmin(admin === 'admin')
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso');
+      router.push("/")
+      return;
+    }
   }, []);
 
   const getPricesList = async () => {

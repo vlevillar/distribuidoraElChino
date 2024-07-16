@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Calendario, { WeekDates } from '@/components/Calendario';
 import RouteTable from '@/components/RouteTable';
 import { Tab, Tabs } from '@nextui-org/react';
+import { useRouter } from 'next/router';
 
 const Rutas = () => {
   const [weekDates, setWeekDates] = useState<WeekDates | null>(null);
   const [selectedDate, setSelectedDate] = useState<WeekDates[0] | null>(null);
+  const router = useRouter()
+  
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso');
+      router.push("/")
+      return;
+    }
+  }, []);
 
   const updateWeekDates = (weekDates: WeekDates) => {
     setWeekDates(weekDates);

@@ -1,5 +1,6 @@
 import OrderItem from "@/components/OrderItem";
 import OrderModal from "@/modals/OrderModal";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 interface Order {
@@ -23,6 +24,7 @@ interface Order {
 
 const Pedidos = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const router = useRouter()
 
   const fetchOrders = async () => {
     try {
@@ -50,6 +52,12 @@ const Pedidos = () => {
 
   useEffect(() => {
     fetchOrders();
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso');
+      router.push("/")
+      return;
+    }
   }, []);
 
   return (

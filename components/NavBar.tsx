@@ -39,12 +39,21 @@ export default function NavBar() {
     }
   }, [])
 
+  
+
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
-      <NavbarContent className='hidden gap-4 sm:flex' justify='center'>
-        <NavbarBrand>
-          <p className='font-bold text-inherit'>ELCHINO</p>
-        </NavbarBrand>
+ <NavbarContent>
+    <NavbarMenuToggle
+      aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+      className="sm:hidden"
+    />
+    <NavbarBrand>
+      <p className='font-bold text-inherit'>ELCHINO</p>
+    </NavbarBrand>
+  </NavbarContent>
+
+  <NavbarContent className='hidden sm:flex'>
         <NavbarItem>
           <Link color={pathname === '/' ? undefined : 'foreground'} href='/'>
             Inicio

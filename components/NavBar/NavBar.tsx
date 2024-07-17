@@ -39,28 +39,31 @@ export default function NavBar() {
     }
   }, [])
 
-  
-
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
- <NavbarContent>
-    <NavbarMenuToggle
-      aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-      className="sm:hidden"
-    />
-    <NavbarBrand>
-      <p className='font-bold text-inherit'>ELCHINO</p>
-    </NavbarBrand>
-  </NavbarContent>
+      <NavbarContent>
+        {isAuthenticated && (
+          <NavbarMenuToggle
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            className='sm:hidden'
+          />
+        )}
+        <NavbarBrand>
+          <p className='font-bold text-inherit'>ELCHINO</p>
+        </NavbarBrand>
+      </NavbarContent>
 
-  <NavbarContent className='hidden sm:flex'>
-        <NavbarItem>
-          <Link color={pathname === '/' ? undefined : 'foreground'} href='/'>
-            Inicio
-          </Link>
-        </NavbarItem>
+      <NavbarContent className='hidden sm:flex'>
         {isAuthenticated && (
           <>
+            <NavbarItem>
+              <Link
+                color={pathname === '/' ? undefined : 'foreground'}
+                href='/'
+              >
+                Inicio
+              </Link>
+            </NavbarItem>
             <NavbarItem>
               <Link
                 color={pathname === '/clientes' ? undefined : 'foreground'}
@@ -108,15 +111,15 @@ export default function NavBar() {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarMenu>
-        <NavbarMenuItem className='pt-4'>
-          <Link className='w-full' href='/' size='lg'>
-            <Home className='pr-2' />
-            Inicio
-          </Link>
-        </NavbarMenuItem>
-        {isAuthenticated && (
-          <>
+      {isAuthenticated && (
+        <>
+          <NavbarMenu>
+            <NavbarMenuItem className='pt-4'>
+              <Link className='w-full' href='/' size='lg'>
+                <Home className='pr-2' />
+                Inicio
+              </Link>
+            </NavbarMenuItem>
             <NavbarMenuItem className='pt-4'>
               <Link className='w-full' href='/clientes' size='lg'>
                 <Users className='pr-2' />
@@ -141,9 +144,9 @@ export default function NavBar() {
                 Productos
               </Link>
             </NavbarMenuItem>
-          </>
-        )}
-      </NavbarMenu>
+          </NavbarMenu>
+        </>
+      )}
     </Navbar>
   )
 }

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input } from "@nextui-org/react";
-import { Lock, User } from "react-feather";
 
 export default function RegisterModal() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -19,6 +19,7 @@ export default function RegisterModal() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          name,
           username,
           password
         })
@@ -28,8 +29,11 @@ export default function RegisterModal() {
         setSuccess('Usuario registrado correctamente');
         setTimeout(() => {
           setSuccess('');
+          setName("")
+          setPassword("")
+          setUsername("")
           onClose();
-        }, 2000); // Cerrar el modal después de 2 segundos
+        }, 2000);
       } else if (response.status === 500) {
         setError('Usuario ya registrado');
       } else {
@@ -55,9 +59,13 @@ export default function RegisterModal() {
               <ModalBody>
                 <Input
                   autoFocus
-                  endContent={
-                    <User className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                  }
+                  label="Nombre y apellido"
+                  placeholder="Ingrese su nombre y apellido"
+                  variant="bordered"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <Input
                   label="Usuario"
                   placeholder="Ingrese su usuario"
                   variant="bordered"
@@ -65,9 +73,6 @@ export default function RegisterModal() {
                   onChange={(e) => setUsername(e.target.value)}
                 />
                 <Input
-                  endContent={
-                    <Lock className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                  }
                   label="Contraseña"
                   placeholder="Ingrese su contraseña"
                   type="password"

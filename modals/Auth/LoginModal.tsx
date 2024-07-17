@@ -14,9 +14,10 @@ import { Lock, User } from 'react-feather'
 interface LoginModalProps {
   onLogin: (username: string, userId: string) => void
   setUserId: (id: string) => void
+  setName: (name: string) => void
 }
 
-export default function LoginModal({ onLogin, setUserId }: LoginModalProps) {
+export default function LoginModal({ onLogin, setUserId, setName }: LoginModalProps) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -58,6 +59,9 @@ export default function LoginModal({ onLogin, setUserId }: LoginModalProps) {
           localStorage.setItem('username', profileData.username)
           onLogin(profileData.username, profileData.id)
           onClose()
+          setName(profileData.name)
+          setUsername("")
+          setPassword("")
         } else {
           console.error(
             'Error al obtener el perfil:',

@@ -10,10 +10,10 @@ import {
   Input
 } from '@nextui-org/react';
 import { Percent } from 'react-feather';
-import SearchOrderClient from '@/components/SearchOrderClient';
-import SearchOrderProduct from '@/components/SearchOrderProduct';
-import ListTabs from '@/components/ListTabs';
-import EditOrderResume from '@/components/EditOrderResume';
+import SearchOrderClient from '@/components/Order/SearchOrderClient';
+import SearchOrderProduct from '@/components/Order/SearchOrderProduct';
+import ListTabs from '@/components/Percent/ListTabs';
+import EditOrderResume from '@/components/Order/EditOrderResume';
 
 interface Client {
   _id: string;

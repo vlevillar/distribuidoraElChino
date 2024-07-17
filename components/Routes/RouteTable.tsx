@@ -8,9 +8,9 @@ import {
   TableCell,
   Button
 } from '@nextui-org/react'
-import RouteModal from '@/modals/RouteModal'
+import RouteModal from '@/modals/Routes/RouteModal'
 import StatusSelect from './StatusSelect'
-import DelRoute from '@/modals/DeleteRoute'
+import DelRoute from '@/modals/Routes/DeleteRoute'
 import { Lock, Trash2 } from 'react-feather'
 
 interface RouteTableProps {

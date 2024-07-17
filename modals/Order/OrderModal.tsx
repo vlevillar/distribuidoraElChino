@@ -10,10 +10,10 @@ import {
   Input
 } from '@nextui-org/react'
 import { Calendar, Percent, PlusCircle } from 'react-feather'
-import SearchOrderClient from '@/components/SearchOrderClient'
-import SearchOrderProduct from '@/components/SearchOrderProduct'
-import OrderResume from '@/components/OrderResume'
-import ListTabs from '@/components/ListTabs'
+import SearchOrderClient from '@/components/Order/SearchOrderClient'
+import SearchOrderProduct from '@/components/Order/SearchOrderProduct'
+import OrderResume from '@/components/Order/OrderResume'
+import ListTabs from '@/components/Percent/ListTabs'
 
 interface Client {
   _id: string

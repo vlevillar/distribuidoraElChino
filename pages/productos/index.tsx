@@ -1,8 +1,8 @@
-import ProductItem from "@/components/ProductItem";
+import ProductItem from "@/components/Products/ProductItem";
 import { Tab, Tabs } from "@nextui-org/react";
-import ProductModal from "@/modals/ProductModal";
+import ProductModal from "@/modals/Products/ProductModal";
 import React, { useEffect, useState } from "react";
-import ListTabs from "@/components/ListTabs";
+import ListTabs from "@/components/Percent/ListTabs";
 import { useRouter } from "next/router";
 
 const Productos = () => {

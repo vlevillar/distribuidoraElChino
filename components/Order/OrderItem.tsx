@@ -6,9 +6,9 @@ import {
   CardHeader,
   Divider
 } from '@nextui-org/react';
-import DelOrderModal from '@/modals/DeleteOrderModal';
-import ViewOrderResume from '@/modals/ViewOrderResume';
-import EditOrderModal from '@/modals/EditOrderModal';
+import DelOrderModal from '@/modals/Order/DeleteOrderModal';
+import ViewOrderResume from '@/modals/Order/ViewOrderResume';
+import EditOrderModal from '@/modals/Order/EditOrderModal';
 
 interface Product {
   _id: string;

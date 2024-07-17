@@ -1,5 +1,5 @@
-import DelListModal from '@/modals/DeleteListModal'
-import PercentModal from '@/modals/PercentModal'
+import DelListModal from '@/modals/Percent/DeleteListModal'
+import PercentModal from '@/modals/Percent/PercentModal'
 import {
   Button,
   Dropdown,

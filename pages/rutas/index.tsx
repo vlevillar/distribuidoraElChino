@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Calendario, { WeekDates } from '@/components/Calendario';
-import RouteTable from '@/components/RouteTable';
+import Calendario, { WeekDates } from '@/components/Routes/Calendario';
+import RouteTable from '@/components/Routes/RouteTable';
 import { Tab, Tabs } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 

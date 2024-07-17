@@ -1,5 +1,5 @@
-import OrderItem from "@/components/OrderItem";
-import OrderModal from "@/modals/OrderModal";
+import OrderItem from "@/components/Order/OrderItem";
+import OrderModal from "@/modals/Order/OrderModal";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 

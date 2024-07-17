@@ -14,7 +14,7 @@ import {
 import ThemeSwitcher from './ThemeSwitcher'
 import { usePathname } from 'next/navigation'
 import { Home, Users, ShoppingBag, Edit, GitPullRequest } from 'react-feather'
-import PercentList from './PercentList'
+import PercentList from '../Percent/PercentList'
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)

@@ -9,7 +9,7 @@ import {
   useDisclosure
 } from '@nextui-org/react'
 import { PlusCircle } from 'react-feather'
-import SearchClient from '@/components/SearchClient'
+import SearchClient from '@/components/Clients/SearchClient'
 
 interface Props {
   currentDate: string | null

@@ -6,9 +6,9 @@ import {
   CardHeader,
   Divider
 } from '@nextui-org/react';
-import AccountModal from '@/modals/AccountModal';
-import EditClient from '@/modals/EditClient';
-import DelClientModal from '@/modals/DeleteClientModal';
+import AccountModal from '@/modals/Clients/AccountModal';
+import EditClient from '@/modals/Clients/EditClient';
+import DelClientModal from '@/modals/Clients/DeleteClientModal';
 
 interface Client {
   _id: string;

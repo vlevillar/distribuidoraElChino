@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import LoginModal from '@/modals/LoginModal'
+import LoginModal from '@/modals/Auth/LoginModal'
 import { Avatar, Button } from '@nextui-org/react'
-import RegisterModal from '@/modals/RegisterModal'
-import RecoverModal from '@/modals/RecoverModal'
-import OpenRoute from '@/components/OpenRoute'
+import RegisterModal from '@/modals/Auth/RegisterModal'
+import RecoverModal from '@/modals/Auth/RecoverModal'
+import OpenRoute from '@/components/Routes/OpenRoute'
 
 export default function Home() {
   const [isLogged, setIsLogged] = useState(false)

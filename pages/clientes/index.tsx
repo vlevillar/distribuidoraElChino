@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import ClientItem from "@/components/ClientItem";
-import ClientModal from "@/modals/ClientModal";
+import ClientItem from "@/components/Clients/ClientItem";
+import ClientModal from "@/modals/Clients/ClientModal";
 import { useRouter } from "next/router";
 
 interface Client {

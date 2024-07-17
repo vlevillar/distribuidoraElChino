@@ -169,10 +169,12 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
     };
 
     try {
+      const accessToken = localStorage.getItem('accessToken');
       const response = await fetch(`${process.env.API_URL}/orders/${order._id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify(orderData)
       });

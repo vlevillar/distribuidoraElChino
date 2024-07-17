@@ -34,10 +34,16 @@ const AccountModal: React.FC<AccountModalProps> = ({ client, fetchData }) => {
 
   const handleUpdateAccount = async (newAccountValue: number) => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('No se encontró el token de acceso');
+        return;
+      }
       const updatedClient = { ...client, currentAccount: newAccountValue, id: client._id };
       const response = await fetch(`${process.env.API_URL}/clients`, {
         method: 'PUT',
         headers: {
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedClient),

@@ -14,7 +14,10 @@ import SearchClient from '@/components/Clients/SearchClient'
 interface Props {
   currentDate: string | null
   onAddRoute: () => void; 
+  userId: string | null
+  routeId: string | null
 }
+
 interface Client {
   _id: string
   name: string
@@ -23,7 +26,7 @@ interface Client {
   phone: string
 }
 
-const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
+const AdminRouteModal: React.FC<Props> = ({ currentDate, onAddRoute, userId, routeId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedClients, setSelectedClients] = useState<Client[]>([])  
  
@@ -34,6 +37,7 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
 
   const formattedDate = currentDate ? convertDateFormat(currentDate) : null;
 
+  
   const crearCliente = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -41,12 +45,14 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
         console.error('No se encontró el token de acceso');
         return;
       }
-      const response = await fetch(
+      
+      const createResponse = await fetch(
         `${process.env.API_URL}/routes`,
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${accessToken}`
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
             clients: selectedClients,
@@ -54,24 +60,46 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
           })
         }
       )
-      if (response.ok) {
-        console.log('Ruta creada exitosamente')
+
+      if (createResponse.ok) {
+        const newRoute = await createResponse.json();
+        console.log('Ruta creada exitosamente');
+
+        if (userId) {
+          const assignResponse = await fetch(
+            `${process.env.API_URL}/routes/assign/${newRoute._id}/${userId}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                date: formattedDate
+              })
+            }
+          )
+
+          if (assignResponse.ok) {
+            console.log('Ruta asignada exitosamente');
+          } else {
+            console.error('Error al asignar ruta');
+          }
+        }
+
         onClose()
         onAddRoute()
       } else {
         console.error('Error al crear ruta')
       }
     } catch (error) {
-      console.error('Error al crear ruta:', error)
+      console.error('Error al crear o asignar ruta:', error)
     }
   }
 
   const handleSelectedClientsChange = (clients: Client[]) => {
     setSelectedClients(clients)
   }
-
-  console.log(selectedClients);
-  
 
   return (
     <>
@@ -102,4 +130,4 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
   )
 }
 
-export default RouteModal
+export default AdminRouteModal

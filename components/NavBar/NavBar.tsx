@@ -13,7 +13,7 @@ import {
 } from '@nextui-org/react'
 import ThemeSwitcher from './ThemeSwitcher'
 import { usePathname } from 'next/navigation'
-import { Home, Users, ShoppingBag, Edit, GitPullRequest } from 'react-feather'
+import { Home, Users, ShoppingBag, Edit, GitPullRequest, Cpu } from 'react-feather'
 import PercentList from '../Percent/PercentList'
 
 export default function NavBar() {
@@ -96,6 +96,16 @@ export default function NavBar() {
                 Productos
               </Link>
             </NavbarItem>
+            {isAdmin && 
+            <NavbarItem>
+              <Link
+                color={pathname === '/admin' ? undefined : 'foreground'}
+                href='/admin'
+              >
+                Administrar
+              </Link>
+            </NavbarItem>
+            }
           </>
         )}
       </NavbarContent>
@@ -144,6 +154,14 @@ export default function NavBar() {
                 Productos
               </Link>
             </NavbarMenuItem>
+          {isAdmin &&
+            <NavbarMenuItem className='pt-4'>
+              <Link className='w-full' href='/productos' size='lg'>
+                <Cpu className='pr-2' />
+                Administrar
+              </Link>
+            </NavbarMenuItem>
+        }
           </NavbarMenu>
         </>
       )}

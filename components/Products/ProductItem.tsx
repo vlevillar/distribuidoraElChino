@@ -6,13 +6,12 @@ interface ProductItemProps {
     id: string;
     price: string;
     name: string;
-    fetchData: () => void;
-    isAdmin: boolean;
-  }
+    fetchData?: () => void;
+    isAdmin?: boolean;
+}
   
 export default function ProductItem( { price, name, id, fetchData, isAdmin }: ProductItemProps ) {
     const product = { _id: id, name, price }
-    console.log('esadmin', isAdmin);
     
     return (
         <Card className="max-w-[300px]">
@@ -21,6 +20,8 @@ export default function ProductItem( { price, name, id, fetchData, isAdmin }: Pr
                     <p className="text-md">{name}</p>
                 </div>
             </CardHeader>
+            {fetchData ?
+            <>
             <Divider />
             {isAdmin &&
                 <CardBody className='flex items-center'>
@@ -34,6 +35,8 @@ export default function ProductItem( { price, name, id, fetchData, isAdmin }: Pr
                 }
                 <DelProductModal name={name} id={id} fetchData={fetchData}/>
             </CardFooter>
+           </>
+            : null}
         </Card>
     )
 }

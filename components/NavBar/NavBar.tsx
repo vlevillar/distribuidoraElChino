@@ -156,7 +156,7 @@ export default function NavBar() {
             </NavbarMenuItem>
           {isAdmin &&
             <NavbarMenuItem className='pt-4'>
-              <Link className='w-full' href='/productos' size='lg'>
+              <Link className='w-full' href='/admin' size='lg'>
                 <Cpu className='pr-2' />
                 Administrar
               </Link>

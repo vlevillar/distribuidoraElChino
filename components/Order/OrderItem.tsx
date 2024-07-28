@@ -31,9 +31,10 @@ interface Order {
 interface OrderItemProps {
   order: Order
   fetchData?: () => void
+  isAdmin?: boolean
 }
 
-export default function OrderItem({ order, fetchData }: OrderItemProps) {
+export default function OrderItem({ order, fetchData, isAdmin }: OrderItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
     const selectedPrice = product.prices[order.selectedList]
     return total + selectedPrice * product.quantity
@@ -56,7 +57,7 @@ export default function OrderItem({ order, fetchData }: OrderItemProps) {
           <p>Total: ${totalPrice.toFixed(2)}</p>
         </div>
       </CardBody>
-      {fetchData ? (
+      {fetchData && isAdmin ? (
         <>
           <Divider />
           <CardFooter className='flex items-center justify-center gap-3'>

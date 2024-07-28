@@ -25,6 +25,7 @@ interface Order {
 const Pedidos = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const router = useRouter()
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const fetchOrders = async () => {
     try {
@@ -53,6 +54,8 @@ const Pedidos = () => {
   useEffect(() => {
     fetchOrders();
     const accessToken = localStorage.getItem('accessToken');
+    const admin = localStorage.getItem('role');
+    setIsAdmin(admin === 'admin')
     if (!accessToken) {
       console.error('No se encontró el token de acceso');
       router.push("/")
@@ -62,12 +65,14 @@ const Pedidos = () => {
 
   return (
     <div className="flex items-center justify-center flex-col">
+      {isAdmin &&
       <div className="pb-4 flex flex-col">
         <OrderModal onSuccess={fetchOrders}/>
       </div>
+      }
       <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xs:grid-cols-1">
         {orders.map((order) => (
-          <OrderItem key={order._id} order={order} fetchData={fetchOrders}/>
+          <OrderItem key={order._id} order={order} fetchData={fetchOrders} isAdmin={isAdmin}/>
         ))}
       </div>
     </div>

@@ -16,9 +16,13 @@ interface Client {
 const Productos: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const router = useRouter()
+  const [isAdmin, setIsAdmin] = useState(false)
+
   useEffect(() => {
     fetchData();
+    const admin = localStorage.getItem('role');
     const accessToken = localStorage.getItem('accessToken');
+    setIsAdmin(admin === 'admin')
     if (!accessToken) {
       console.error('No se encontró el token de acceso');
       router.push("/")
@@ -54,12 +58,14 @@ const Productos: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center flex-col">
+      {isAdmin &&
       <div className="pb-4 flex flex-col">
         <ClientModal onClientCreated={fetchData} />
       </div>
+      }
       <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xs:grid-cols-1">
         {sortedClients.map((client) => (
-          <ClientItem key={client._id} client={client} fetchData={fetchData} />
+          <ClientItem key={client._id} client={client} fetchData={fetchData} isAdmin={isAdmin}/>
         ))}
       </div>
     </div>

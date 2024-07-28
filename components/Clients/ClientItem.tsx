@@ -22,9 +22,10 @@ interface Client {
 interface ClientItemProps {
   client: Client
   fetchData?: () => void
+  isAdmin?: boolean;
 }
 
-const ClientItem: React.FC<ClientItemProps> = ({ fetchData, client }) => {
+const ClientItem: React.FC<ClientItemProps> = ({ fetchData, client, isAdmin }) => {
   const { name, address, phone, type, _id, currentAccount, clientNumber } =
     client
 
@@ -51,7 +52,8 @@ const ClientItem: React.FC<ClientItemProps> = ({ fetchData, client }) => {
             </p>
           </div>
         </CardHeader>
-        {fetchData ? (
+        
+        {fetchData && isAdmin ? (
           <>
             <Divider />
             <CardFooter className='flex items-center justify-center gap-3'>

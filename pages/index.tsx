@@ -15,13 +15,27 @@ export default function Home() {
   useEffect(() => {
     const storedUsername = localStorage.getItem('username')
     const storedUserId = localStorage.getItem('userId')
+    const storedName = localStorage.getItem('name')
     if (storedUsername && storedUserId) {
       setIsLogged(true)
       setUserProfile(storedUsername)
       setUserId(storedUserId)
+      setName(storedName || "")
       fetchUserData(storedUserId)
     }
   }, [])
+
+  const handleLogin = (profile: string, newUserId: string, name: string) => {
+    setIsLogged(true)
+    setUserProfile(profile)
+    setUserId(newUserId)
+    setName(name)
+    localStorage.setItem('username', profile)
+    localStorage.setItem('name', name)
+    localStorage.setItem('userId', newUserId)
+    fetchUserData(newUserId)
+    document.dispatchEvent(authEvent);
+  }
 
   const fetchUserData = async (userId: string) => {
     try {
@@ -36,21 +50,12 @@ export default function Home() {
     }
   }
 
-  const handleLogin = (profile: string, newUserId: string) => {
-    setIsLogged(true)
-    setUserProfile(profile)
-    setUserId(newUserId)
-    localStorage.setItem('username', profile)
-    localStorage.setItem('userId', newUserId)
-    fetchUserData(newUserId)
-    document.dispatchEvent(authEvent);
-  }
-
   const handleLogout = () => {
     setIsLogged(false)
     setUserProfile(null)
     setUserId(null)
     localStorage.removeItem('username')
+    localStorage.removeItem('name')
     localStorage.removeItem('role')
     localStorage.removeItem('userId')
     localStorage.removeItem('openroute')
@@ -77,7 +82,7 @@ export default function Home() {
           </div>
         ) : (
           <div className='flex justify-between gap-2 py-2 pb-4'>
-            <LoginModal onLogin={handleLogin} setUserId={setUserId} setName={setName}/>
+            <LoginModal onLogin={handleLogin} setUserId={setUserId}/>
             <RegisterModal />
             <RecoverModal />
           </div>

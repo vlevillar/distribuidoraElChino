@@ -12,12 +12,11 @@ import {
 import { Lock, User } from 'react-feather'
 
 interface LoginModalProps {
-  onLogin: (username: string, userId: string) => void
+  onLogin: (username: string, userId: string,  name:string) => void
   setUserId: (id: string) => void
-  setName: (name: string) => void
 }
 
-export default function LoginModal({ onLogin, setUserId, setName }: LoginModalProps) {
+export default function LoginModal({ onLogin, setUserId }: LoginModalProps) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -57,9 +56,8 @@ export default function LoginModal({ onLogin, setUserId, setName }: LoginModalPr
           localStorage.setItem('userId', profileData.id)
           localStorage.setItem('accessToken', accessToken)
           localStorage.setItem('username', profileData.username)
-          onLogin(profileData.username, profileData.id)
+          onLogin(profileData.username, profileData.id, profileData.name)
           onClose()
-          setName(profileData.name)
           setUsername("")
           setPassword("")
         } else {
@@ -87,7 +85,7 @@ export default function LoginModal({ onLogin, setUserId, setName }: LoginModalPr
       <Button onPress={onOpen} color='primary'>
         Ingresar
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement='top-center'>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement='center'>
         <ModalContent>
           {onClose => (
             <>

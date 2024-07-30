@@ -52,8 +52,6 @@ const Productos: React.FC = () => {
     }
   };
 
-  console.log(clients);
-
   const sortedClients = [...clients].sort((a, b) => a.clientNumber - b.clientNumber);
 
   return (

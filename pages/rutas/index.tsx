@@ -7,10 +7,13 @@ import { useRouter } from 'next/router';
 const Rutas = () => {
   const [weekDates, setWeekDates] = useState<WeekDates | null>(null);
   const [selectedDate, setSelectedDate] = useState<WeekDates[0] | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
   
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
+    const admin = localStorage.getItem('role');
+    setIsAdmin(admin === 'admin')
     if (!accessToken) {
       console.error('No se encontró el token de acceso');
       router.push("/")
@@ -40,7 +43,7 @@ const Rutas = () => {
         </Tabs>
         <Calendario updateWeekDates={updateWeekDates} />
       </div>
-      <RouteTable date={selectedDate}/>
+      <RouteTable date={selectedDate} isAdmin={isAdmin}/>
     </>
   );
 };

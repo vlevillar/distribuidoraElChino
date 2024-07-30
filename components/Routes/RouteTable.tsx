@@ -15,6 +15,7 @@ import { Lock, Trash2 } from 'react-feather'
 
 interface RouteTableProps {
   date: string | null
+  isAdmin: boolean
 }
 
 interface RouteClient {
@@ -33,7 +34,7 @@ interface Route {
   _id: string
 }
 
-const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
+const RouteTable: React.FC<RouteTableProps> = ({ date, isAdmin }) => {
   const [routes, setRoutes] = useState<Route[]>([])
   const [disabled, setDisabled] = useState(false)
   const [routeId, setRouteId] = useState('')
@@ -208,6 +209,8 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
       }
       bottomContent={
         <div className='flex flex-col gap-2'>
+          {isAdmin &&
+          <>
           <RouteModal currentDate={date} onAddRoute={handleAddRoute} />
           <DelRoute
             currentDate={date}
@@ -215,6 +218,8 @@ const RouteTable: React.FC<RouteTableProps> = ({ date }) => {
             disabled={disabled}
             onDeleteSuccess={handleDeleteSuccess}
           />
+          </>
+      }
           {username ? (
             isOpenRoute ? (
               <Button

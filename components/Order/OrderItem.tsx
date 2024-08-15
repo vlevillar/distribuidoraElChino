@@ -9,6 +9,8 @@ import {
 import DelOrderModal from '@/modals/Order/DeleteOrderModal'
 import ViewOrderResume from '@/modals/Order/ViewOrderResume'
 import EditOrderModal from '@/modals/Order/EditOrderModal'
+import { FileText, Printer } from 'react-feather'
+import Link from 'next/link'
 
 interface Product {
   _id: string
@@ -34,7 +36,11 @@ interface OrderItemProps {
   isAdmin?: boolean
 }
 
-export default function OrderItem({ order, fetchData, isAdmin }: OrderItemProps) {
+export default function OrderItem({
+  order,
+  fetchData,
+  isAdmin
+}: OrderItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
     const selectedPrice = product.prices[order.selectedList]
     return total + selectedPrice * product.quantity
@@ -55,6 +61,24 @@ export default function OrderItem({ order, fetchData, isAdmin }: OrderItemProps)
             selectedList={order.selectedList}
           />
           <p>Total: ${totalPrice.toFixed(2)}</p>
+          <div className='mt-2 flex justify-around gap-6'>
+            <Link
+              href={`${process.env.API_URL}/orders/${order._id}`}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <Printer className='cursor-pointer' />
+            </Link>
+            {isAdmin && (
+              <Link
+                href={`${process.env.API_URL}/remits/${order._id}`}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <FileText className='cursor-pointer' />
+              </Link>
+            )}
+          </div>
         </div>
       </CardBody>
       {fetchData && isAdmin ? (

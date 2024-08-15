@@ -122,7 +122,6 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       setTotalWithDiscount(total)
     }
   }
-console.log('selected: ',selectedProducts);
 
   const handleCreateOrder = async () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -145,6 +144,8 @@ console.log('selected: ',selectedProducts);
       clientId: selectedClient._id,
       clientName: selectedClient.name,
       clientNumber: selectedClient.clientNumber,
+      clientAddress: selectedClient.address,
+      clientPhone: selectedClient.phone,
       products: transformedProducts,
       discount: discount,
       selectedList: Number(selected)

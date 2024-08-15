@@ -20,7 +20,7 @@ interface SearchClientProps {
 export default function SearchOrderClient({ onSelectedClientsChange, initialClient }: SearchClientProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedClient, setSelectedClient] = useState<Client | null | undefined>(initialClient); // Inicialización con initialClient
+  const [selectedClient, setSelectedClient] = useState<Client | null | undefined>(initialClient);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,7 +49,7 @@ export default function SearchOrderClient({ onSelectedClientsChange, initialClie
   }, []);
 
   useEffect(() => {
-    setSelectedClient(initialClient); // Actualización del cliente seleccionado al inicializar
+    setSelectedClient(initialClient); 
   }, [initialClient]);
 
   const handleChipClick = (client: Client) => {

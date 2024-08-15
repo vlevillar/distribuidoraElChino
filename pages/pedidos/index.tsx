@@ -34,7 +34,7 @@ const Pedidos = () => {
         console.error('No se encontró el token de acceso');
         return;
       }
-      const response = await fetch(`${process.env.API_URL}/orders`, {
+      const response = await fetch(`${process.env.API_URL}/orders/all`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`

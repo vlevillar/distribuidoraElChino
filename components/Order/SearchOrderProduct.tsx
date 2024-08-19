@@ -57,18 +57,18 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
     }
   }, [products, initialProducts]);
 
-  const handleChipClick = useCallback((index: number) => {
-    const selectedProduct = products[index];
+  const handleChipClick = useCallback((productId: string) => {
     setSelectedProducts(prevSelectedProducts => {
-      const isProductSelected = prevSelectedProducts.some(product => product._id === selectedProduct._id);
+      const isProductSelected = prevSelectedProducts.some(product => product._id === productId);
       if (isProductSelected) {
-        return prevSelectedProducts.filter(product => product._id !== selectedProduct._id);
+        return prevSelectedProducts.filter(product => product._id !== productId);
       } else {
-        return [...prevSelectedProducts, { ...selectedProduct, quantity: 1 }];
+        const selectedProduct = products.find(product => product._id === productId);
+        return selectedProduct ? [...prevSelectedProducts, { ...selectedProduct, quantity: 1 }] : prevSelectedProducts;
       }
     });
-  }, [products, selectedProducts]);
-
+  }, [products]);
+  
   useEffect(() => {
     const updatedSelectedChips = products.map(product =>
       selectedProducts.some(selectedProduct => selectedProduct._id === product._id)
@@ -103,15 +103,15 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
       <Divider />
       <CardBody>
         <div className='scroll-container flex h-24 flex-wrap gap-1 overflow-y-auto'>
-          {sortedProducts.map((product, index) => (
-            <Chip
-              key={product._id}
-              onClick={() => handleChipClick(index)}
-              color={selectedChips[index] ? 'success' : 'default'}
-            >
-              {product.name}
-            </Chip>
-          ))}
+        {sortedProducts.map(product => (
+          <Chip
+            key={product._id}
+            onClick={() => handleChipClick(product._id)}
+            color={selectedProducts.some(selectedProduct => selectedProduct._id === product._id) ? 'success' : 'default'}
+          >
+            {product.name}
+          </Chip>
+        ))}
         </div>
       </CardBody>
     </Card>

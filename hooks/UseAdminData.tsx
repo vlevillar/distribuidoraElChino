@@ -45,7 +45,7 @@ const useAdminData = () => {
     };
 
     fetchData(`${process.env.API_URL}/user`, setUsers);
-    fetchData(`${process.env.API_URL}/clients/all`, setClients);
+    fetchData(`${process.env.API_URL}/clients`, setClients);
     fetchData(`${process.env.API_URL}/products`, setProducts);
     fetchData(`${process.env.API_URL}/orders/all`, setOrders);
   }, []);

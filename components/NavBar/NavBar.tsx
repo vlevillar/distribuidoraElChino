@@ -27,6 +27,8 @@ export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isAuthenticated, setIsAuthenticated] = React.useState(false)
   const [isAdmin, setIsAdmin] = React.useState(false)
+  console.log(isAdmin);
+  
   const pathname = usePathname()
 
   React.useEffect(() => {

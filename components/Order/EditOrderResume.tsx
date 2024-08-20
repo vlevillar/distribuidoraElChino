@@ -123,7 +123,6 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
               <Input
                 placeholder='0.00'
                 variant='underlined'
-                type='number'
                 onChange={e =>
                   handleQuantityChange(product._id, e.target.value)
                 }

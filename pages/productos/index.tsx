@@ -1,106 +1,123 @@
-import ProductItem from "@/components/Products/ProductItem";
-import { Tab, Tabs } from "@nextui-org/react";
-import ProductModal from "@/modals/Products/ProductModal";
-import React, { useEffect, useState } from "react";
-import ListTabs from "@/components/Percent/ListTabs";
-import { useRouter } from "next/router";
+import ProductItem from '@/components/Products/ProductItem'
+import { Input, Tab, Tabs } from '@nextui-org/react'
+import ProductModal from '@/modals/Products/ProductModal'
+import React, { useEffect, useState } from 'react'
+import ListTabs from '@/components/Percent/ListTabs'
+import { useRouter } from 'next/router'
+import { Search } from 'react-feather'
 
 const Productos = () => {
-  const [selected, setSelected] = useState(1);
-  const [percent, setPercent] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [selected, setSelected] = useState(1)
+  const [percent, setPercent] = useState<any[]>([])
+  const [products, setProducts] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
   const [isAdmin, setIsAdmin] = React.useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const admin = localStorage.getItem('role')
-    getPricesList();
-    getProducts();
+    getPricesList()
+    getProducts()
     setIsAdmin(admin === 'admin')
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem('accessToken')
     if (!accessToken) {
-      console.error('No se encontró el token de acceso');
-      router.push("/")
-      return;
+      console.error('No se encontró el token de acceso')
+      router.push('/')
+      return
     }
-  }, []);
+  }, [])
 
   const getPricesList = async () => {
     try {
-      const response = await fetch(
-        `${process.env.API_URL}/pricesList`,
-        {
-          method: 'GET'
-        }
-      );
+      const response = await fetch(`${process.env.API_URL}/pricesList`, {
+        method: 'GET'
+      })
       if (response.ok) {
-        console.log('Datos de precios obtenidos exitosamente');
-        const data = await response.json();
-        setPercent(data);
+        console.log('Datos de precios obtenidos exitosamente')
+        const data = await response.json()
+        setPercent(data)
       } else {
-        console.error('Error al obtener datos de precios');
+        console.error('Error al obtener datos de precios')
       }
     } catch (error) {
-      console.error('Error al obtener datos de precios:', error);
+      console.error('Error al obtener datos de precios:', error)
     }
-  };
+  }
 
   const getProducts = async () => {
     try {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem('accessToken')
       if (!accessToken) {
-        console.error('No se encontró el token de acceso');
-        return;
+        console.error('No se encontró el token de acceso')
+        return
       }
-      const response = await fetch(
-        `${process.env.API_URL}/products`,
-        {
-          method: 'GET',
-          headers:{'Authorization': `Bearer ${accessToken}`}
-        }
-      );
+      const response = await fetch(`${process.env.API_URL}/products`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
       if (response.ok) {
-        console.log('Datos de productos obtenidos exitosamente');
-        const data = await response.json();
-        setProducts(data);
+        console.log('Datos de productos obtenidos exitosamente')
+        const data = await response.json()
+        setProducts(data)
       } else {
-        console.error('Error al obtener datos de productos');
+        console.error('Error al obtener datos de productos')
       }
     } catch (error) {
-      console.error('Error al obtener datos de productos:', error);
+      console.error('Error al obtener datos de productos:', error)
     }
-  };
+  }
 
   const handleSelectionChange = (key: any) => {
-    setSelected(key);
-  };
+    setSelected(key)
+  }
 
   const handleProductCreated = () => {
-    getProducts();
-  };
+    getProducts()
+  }
 
-  console.log(isAdmin);
-  
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
-    <div className="flex items-center justify-center flex-col">
-      <div className="pb-4 flex flex-col">
-        {isAdmin &&
-        <> 
-        <ProductModal onProductCreated={handleProductCreated} />
-        <div className="flex justify-center pt-2">
-          <ListTabs handle={handleSelectionChange} selected={selected} list={percent} />
-        </div>
-        </>
-        }
+    <div className='flex flex-col items-center justify-center'>
+      <div className='flex flex-col pb-4'>
+        {isAdmin && (
+          <>
+            <ProductModal onProductCreated={handleProductCreated} />
+            <div className='flex justify-center pt-2'>
+              <ListTabs
+                handle={handleSelectionChange}
+                selected={selected}
+                list={percent}
+              />
+            </div>
+          </>
+        )}
       </div>
-      <div className="gap-2 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-3">
-        {products.map((product, index) => (
-          <ProductItem key={index} price={product.prices[selected]} name={product.name} id={product._id} fetchData={getProducts} isAdmin={isAdmin}/>
+      <div className='pb-4'>
+        <Input
+          startContent={<Search />}
+          type='text'
+          placeholder='Buscar productos...'
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <div className='grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-3'>
+        {filteredProducts.map((product, index) => (
+          <ProductItem
+            key={index}
+            price={product.prices[selected]}
+            name={product.name}
+            id={product._id}
+            fetchData={getProducts}
+            isAdmin={isAdmin}
+          />
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Productos;
+export default Productos

@@ -91,7 +91,6 @@ const OrderResume: React.FC<OrderResumeProps> = ({
             <TableCell>{product.name}</TableCell>
             <TableCell>
               <Input
-                type="number"
                 placeholder="0.00"
                 variant="underlined"
                 value={product.quantity.toString()}

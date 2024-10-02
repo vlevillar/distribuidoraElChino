@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { Card, CardHeader, CardBody, Divider, Input, Chip } from '@nextui-org/react';
 import { ShoppingBag } from 'react-feather';
 
@@ -19,9 +19,14 @@ interface SearchProductProps {
 
 export default function SearchOrderProduct({ onSelectedProductChange, initialProducts }: SearchProductProps) {
   const [products, setProducts] = useState<Product[]>([]);
+  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedChips, setSelectedChips] = useState<boolean[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>(initialProducts || []);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const PRODUCTS_PER_PAGE = 10;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,21 +43,17 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
           throw new Error('Failed to fetch products');
         }
         const data: Product[] = await response.json();
-        setProducts(data);
+        setProducts(data.sort((a, b) => a.name.localeCompare(b.name)));
       } catch (error) {
         console.error('Error fetching products:', error);
       }
     };
 
     fetchData();
-  }, []); // Este efecto ahora solo se ejecuta una vez al montar el componente
+  }, []);
 
   useEffect(() => {
     if (products.length > 0 && initialProducts) {
-      const initialSelectedChips = products.map(product =>
-        initialProducts.some(initialProduct => initialProduct._id === product._id)
-      );
-      setSelectedChips(initialSelectedChips);
       setSelectedProducts(initialProducts);
     }
   }, [products, initialProducts]);
@@ -68,13 +69,6 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
       }
     });
   }, [products]);
-  
-  useEffect(() => {
-    const updatedSelectedChips = products.map(product =>
-      selectedProducts.some(selectedProduct => selectedProduct._id === product._id)
-    );
-    setSelectedChips(updatedSelectedChips);
-  }, [products, selectedProducts]);
 
   useEffect(() => {
     onSelectedProductChange(selectedProducts);
@@ -86,15 +80,37 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
     );
   }, [products, searchTerm]);
 
-  const sortedProducts = useMemo(() => {
-    return filteredProducts.slice().sort((a, b) => a.name.localeCompare(b.name));
-  }, [filteredProducts]);
+  useEffect(() => {
+    setDisplayedProducts(filteredProducts.slice(0, PRODUCTS_PER_PAGE));
+    setPage(1);
+    setHasMore(filteredProducts.length > PRODUCTS_PER_PAGE);
+  }, [searchTerm, filteredProducts]);
+
+  const loadMoreProducts = useCallback(() => {
+    if (loading) return;
+    setLoading(true);
+    const nextProducts = filteredProducts.slice(page * PRODUCTS_PER_PAGE, (page + 1) * PRODUCTS_PER_PAGE);
+    setDisplayedProducts(prev => [...prev, ...nextProducts]);
+    setPage(prev => prev + 1);
+    setHasMore(filteredProducts.length > (page + 1) * PRODUCTS_PER_PAGE);
+    setLoading(false);
+  }, [filteredProducts, page, loading]);
+
+  const lastProductElementRef = useCallback((node: HTMLElement | null) => {
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMoreProducts();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadMoreProducts, hasMore]);
 
   return (
-    <Card className='max-w-[400px]'>
-      <CardHeader className='flex gap-3'>
+    <Card className="max-w-[400px]">
+      <CardHeader className="flex gap-3">
         <Input
-          placeholder='Buscar Producto'
+          placeholder="Buscar Producto"
           startContent={<ShoppingBag />}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
@@ -102,16 +118,18 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
       </CardHeader>
       <Divider />
       <CardBody>
-        <div className='scroll-container flex h-24 flex-wrap gap-1 overflow-y-auto'>
-        {sortedProducts.map(product => (
-          <Chip
-            key={product._id}
-            onClick={() => handleChipClick(product._id)}
-            color={selectedProducts.some(selectedProduct => selectedProduct._id === product._id) ? 'success' : 'default'}
-          >
-            {product.name}
-          </Chip>
-        ))}
+        <div className="scroll-container flex h-24 flex-wrap gap-1 overflow-y-auto">
+          {displayedProducts.map((product, index) => (
+            <Chip
+              key={product._id}
+              onClick={() => handleChipClick(product._id)}
+              color={selectedProducts.some(selectedProduct => selectedProduct._id === product._id) ? 'success' : 'default'}
+              ref={index === displayedProducts.length - 1 ? lastProductElementRef : null}
+            >
+              {product.name}
+            </Chip>
+          ))}
+          {loading && <div>Loading...</div>}
         </div>
       </CardBody>
     </Card>

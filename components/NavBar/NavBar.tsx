@@ -2,15 +2,14 @@
 import React from 'react'
 import {
   Navbar,
-  NavbarBrand,
   NavbarMenuToggle,
   NavbarMenuItem,
   NavbarMenu,
   NavbarContent,
   NavbarItem,
   Link,
-  Button
 } from '@nextui-org/react'
+import { Image } from "@nextui-org/image";
 import ThemeSwitcher from './ThemeSwitcher'
 import { usePathname } from 'next/navigation'
 import {
@@ -27,7 +26,6 @@ export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isAuthenticated, setIsAuthenticated] = React.useState(false)
   const [isAdmin, setIsAdmin] = React.useState(false)
-  console.log(isAdmin);
   
   const pathname = usePathname()
 
@@ -57,9 +55,11 @@ export default function NavBar() {
             className='sm:hidden'
           />
         )}
-        <NavbarBrand>
-          <p className='font-bold text-inherit'>ELCHINO</p>
-        </NavbarBrand>
+        <Image
+          width={200}
+          alt='Logo Sapori'
+          src='https://i.ibb.co/CJM3364/sapori-logo.png'
+        />
       </NavbarContent>
 
       <NavbarContent className='hidden sm:flex'>

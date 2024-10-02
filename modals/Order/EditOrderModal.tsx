@@ -59,45 +59,16 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
   const [total, setTotal] = useState(0);
   const [totalWithDiscount, setTotalWithDiscount] = useState(0);
 
-  console.log('selectedProducts:', selectedProducts);
-
   const memoizedSelectedProducts = useMemo(() => selectedProducts, [selectedProducts.map(p => p._id).join(',')]);
 
-  useEffect(() => {
-    getPricesList();
-  }, []);
-
-  useEffect(() => {
-    if (order) {
-      setSelectedClient({
-        _id: order.clientId,
-        clientNumber: order.clientNumber,
-        name: order.clientName,
-        address: '',
-        type: '',
-        phone: ''
-      });
-      setSelectedProducts(order.products);
-      setDiscount(order.discount);
-      calculateTotalWithDiscount();
-    }
-  }, [order]);
-
-  useEffect(() => {
-    if (order) {
-      setSelectedProducts(order.products);
-    }
-  }, [order]); 
-  
-
-  useEffect(() => {
-    calculateTotalWithDiscount();
-  }, [total, discount]);
-
-  const getPricesList = async () => {
+  const getPricesList = useCallback(async () => {
     try {
+      const accessToken = localStorage.getItem('accessToken');
       const response = await fetch(`${process.env.API_URL}/pricesList`, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
       });
       if (response.ok) {
         console.log('Datos de precios obtenidos exitosamente');
@@ -109,7 +80,34 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
     } catch (error) {
       console.error('Error al obtener datos de precios:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      getPricesList();
+    }
+  }, [isOpen, getPricesList]);
+
+  useEffect(() => {
+    if (order && isOpen) {
+      setSelectedClient({
+        _id: order.clientId,
+        clientNumber: order.clientNumber,
+        name: order.clientName,
+        address: '',
+        type: '',
+        phone: ''
+      });
+      setSelectedProducts(order.products);
+      setDiscount(order.discount);
+      setSelected(order.selectedList);
+      calculateTotalWithDiscount();
+    }
+  }, [order, isOpen]);
+
+  useEffect(() => {
+    calculateTotalWithDiscount();
+  }, [total, discount]);
 
   const handleSelectedClientChange = (clients: Client[]) => {
     setSelectedClient(clients.length > 0 ? clients[0] : null);
@@ -221,7 +219,6 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
                 />
                 </div>
                 <div className='flex-row'>
-                <p className='py-2'>Seleccione la lista:</p>
                 <ListTabs
                   handle={handleSelectionChange}
                   selected={selected}

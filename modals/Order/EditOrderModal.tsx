@@ -59,13 +59,11 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
   const [total, setTotal] = useState(0);
   const [totalWithDiscount, setTotalWithDiscount] = useState(0);
 
-  console.log('selectedProducts:', selectedProducts);
-
   const memoizedSelectedProducts = useMemo(() => selectedProducts, [selectedProducts.map(p => p._id).join(',')]);
 
-  useEffect(() => {
-    getPricesList();
-  }, []);
+  // useEffect(() => {
+  //   getPricesList();
+  // }, []);
 
   useEffect(() => {
     if (order) {

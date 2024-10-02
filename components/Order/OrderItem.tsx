@@ -1,5 +1,4 @@
 import {
-  Button,
   Card,
   CardBody,
   CardFooter,
@@ -28,6 +27,7 @@ interface Order {
   products: Product[]
   discount: string
   selectedList: number
+  date: string;
 }
 
 interface OrderItemProps {
@@ -56,6 +56,7 @@ export default function OrderItem({
       <Divider />
       <CardBody>
         <div className='flex flex-col items-center justify-center'>
+          <p className='text-small'>Fecha: {order.date.split('T')[0]}</p>
           <ViewOrderResume
             orderData={order.products}
             selectedList={order.selectedList}

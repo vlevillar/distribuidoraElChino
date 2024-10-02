@@ -39,7 +39,7 @@ export default function SearchClient({ onSelectedClientsChange }: SearchClientPr
         }
       
         const url = userRole === 'admin' 
-          ? `${process.env.API_URL}/clients/all` 
+          ? `${process.env.API_URL}/clients` 
           : `${process.env.API_URL}/clients`;
 
         const response = await fetch(url, {

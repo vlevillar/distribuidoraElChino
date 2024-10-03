@@ -16,6 +16,8 @@ interface Product {
   _id: string;
   name: string;
   price: string;
+  measurement: string;
+  code: string;
 }
 
 interface EditProductProps {
@@ -27,10 +29,26 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState(product.name);
   const [price, setPrice] = useState(product.price);
-
+  const [measurement, setMeasurement] = useState(product.measurement);
+  const [isKilogramChecked, setIsKilogramChecked] = useState(false);
+  const [isUnitChecked, setIsUnitChecked] = useState(false);
+  const [code, setCode] = useState(product.code);
+  
   useEffect(() => {
     setName(product.name);
     setPrice(product.price);
+    setMeasurement(product.measurement);
+    setCode(product.code);
+    if (measurement === 'kilogram') {
+      setIsKilogramChecked(true);
+      setIsUnitChecked(false);
+    } else if (measurement === 'unit') {
+      setIsKilogramChecked(false);
+      setIsUnitChecked(true);
+    } else {
+      setIsKilogramChecked(false);
+      setIsUnitChecked(false);
+    }
   }, [product]);
 
   const updateProduct = async () => {
@@ -46,18 +64,22 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
             name: name,
             price: parseFloat(price),
+            measurement: isKilogramChecked ? 'kilogram' : 'unit', 
+            code: code,
           }),
         }
       );
       if (response.ok) {
         console.log('Producto actualizado exitosamente');
-        onClose();
+        const updatedMeasurement = isKilogramChecked ? 'kilogram' : 'unit';
+        setMeasurement(updatedMeasurement);
         fetchData();
+        onClose();
       } else {
         console.error('Error al actualizar Producto');
       }
@@ -68,39 +90,68 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
 
   return (
     <>
-      <Button onClick={onOpen} color='default' size='sm'>
+      <Button onClick={onOpen} color="default" size="sm">
         Editar
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose} placement='center'>
+      <Modal isOpen={isOpen} onClose={onClose} placement="center">
         <ModalContent>
-          <ModalHeader className='flex flex-col gap-1'>
+          <ModalHeader className="flex flex-col gap-1">
             Editar producto
           </ModalHeader>
           <ModalBody>
             <Input
               autoFocus
-              label='Nombre'
-              placeholder='Nombre del producto'
-              variant='bordered'
+              label="Nombre"
+              placeholder="Nombre del producto"
+              variant="bordered"
               endContent={<Edit />}
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
             />
             <Input
-              label='Precio'
-              placeholder='0.00'
-              type='number'
-              variant='bordered'
+              label="Precio"
+              placeholder="0.00"
+              type="number"
+              variant="bordered"
               endContent={<DollarSign />}
               value={price}
-              onChange={e => setPrice(e.target.value)}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+            <div className="flex gap-4">
+              <Checkbox
+                isSelected={isKilogramChecked}
+                onChange={() => {
+                  setIsKilogramChecked(!isKilogramChecked);
+                  setIsUnitChecked(false);
+                }}
+              >
+                Kg
+              </Checkbox>
+              <Checkbox
+                isSelected={isUnitChecked}
+                onChange={() => {
+                  setIsUnitChecked(!isUnitChecked);
+                  setIsKilogramChecked(false);
+                }}
+              >
+                Unidad
+              </Checkbox>
+            </div>
+            <Input
+              label="Código"
+              placeholder="Código del producto"
+              type="number"
+              variant="bordered"
+              endContent={<Edit />}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
             />
           </ModalBody>
           <ModalFooter>
-            <Button color='danger' variant='flat' onClick={onClose}>
+            <Button color="danger" variant="flat" onClick={onClose}>
               Cerrar
             </Button>
-            <Button color='success' onClick={updateProduct}>
+            <Button color="success" onClick={updateProduct}>
               Actualizar
             </Button>
           </ModalFooter>

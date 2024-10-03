@@ -8,10 +8,12 @@ interface ProductItemProps {
     name: string;
     fetchData?: () => void;
     isAdmin?: boolean;
+    code: string;
+    measurement: string;
 }
   
-export default function ProductItem( { price, name, id, fetchData, isAdmin }: ProductItemProps ) {
-    const product = { _id: id, name, price }
+export default function ProductItem( { price, name, id, code, measurement, fetchData, isAdmin }: ProductItemProps ) {
+    const product = { _id: id, name, price, code, measurement }
     
     return (
         <Card className="max-w-[300px]">

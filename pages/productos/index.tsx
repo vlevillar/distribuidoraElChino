@@ -35,8 +35,6 @@ const Productos = () => {
       if (response.ok) {
         console.log('Datos de precios obtenidos exitosamente')
         const data = await response.json()
-        console.log(data);
-        
         setPercent(data)
       } else {
         console.error('Error al obtener datos de precios')
@@ -83,12 +81,8 @@ const Productos = () => {
 
   const getPrice = (product: any, selectedList: string | number) => {
     const listIndex = typeof selectedList === 'string' ? parseInt(selectedList) : selectedList;
-    return product.prices[listIndex] || product.prices[0]; // Si no hay precio en el índice seleccionado, usa el precio base
+    return product.prices[listIndex] || product.prices[0];
   };
-  
-
-  console.log(products);
-  
 
   return (
     <div className='flex flex-col items-center justify-center'>
@@ -124,6 +118,8 @@ const Productos = () => {
             id={product._id}
             fetchData={getProducts}
             isAdmin={isAdmin}
+            measurement={product.measurement}
+            code={product.code}
           />
         ))}
       </div>

@@ -41,28 +41,49 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
         console.error('No se encontró el token de acceso');
         return;
       }
+  
+      // Ensure clients is an array and not empty
+      if (!Array.isArray(selectedClients) || selectedClients.length === 0) {
+        console.error('La lista de clientes está vacía o no es un array válido');
+        return;
+      }
+  
+      // Format the date to ISO 8601
+      const isoDate = formattedDate ? new Date(formattedDate).toISOString() : null;
+      if (!isoDate) {
+        console.error('Fecha inválida');
+        return;
+      }
+  
+      const payload = {
+        clients: selectedClients,
+        date: isoDate
+      };
+  
+      console.log('Payload being sent:', payload); // Log the payload for debugging
+  
       const response = await fetch(
         `${process.env.API_URL}/routes`,
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${accessToken}`
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json' // Add this line
           },
-          body: JSON.stringify({
-            clients: selectedClients,
-            date: formattedDate
-          })
+          body: JSON.stringify(payload)
         }
-      )
+      );
+  
       if (response.ok) {
-        console.log('Ruta creada exitosamente')
-        onClose()
-        onAddRoute()
+        console.log('Ruta creada exitosamente');
+        onClose();
+        onAddRoute();
       } else {
-        console.error('Error al crear ruta')
+        const errorData = await response.json();
+        console.error('Error al crear ruta:', errorData);
       }
     } catch (error) {
-      console.error('Error al crear ruta:', error)
+      console.error('Error al crear ruta:', error);
     }
   }
 

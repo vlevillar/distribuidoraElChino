@@ -7,6 +7,8 @@ interface Product {
   _id: string
   price: string
   name: string
+  measurement: string
+  code: string
 }
 
 interface AddProductsProps {
@@ -59,6 +61,8 @@ export default function AddProducts({
             id={product._id}
             price={product.price}
             name={product.name}
+            measurement={product.measurement}
+            code={product.code}
             isAssigned={userProducts.has(product._id)}
             selectedUserId={selectedUserId}
             onAssignmentChange={onProductAssignmentChange}

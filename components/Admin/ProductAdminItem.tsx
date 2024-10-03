@@ -7,6 +7,8 @@ interface ProductItemProps {
   id: string
   price: string
   name: string
+  measurement: string
+  code: string
   fetchData?: () => void
   isAdmin?: boolean
   isAssigned: boolean
@@ -18,13 +20,15 @@ export default function ProductAdminItem({
   id,
   price,
   name,
+  measurement,
+  code,
   fetchData,
   isAdmin,
   isAssigned,
   selectedUserId,
   onAssignmentChange
 }: ProductItemProps) {
-  const product = { _id: id, name, price }
+  const product = { _id: id, name, price, measurement, code}
 
   const handleAssignmentChange = async () => {
     if (selectedUserId) {

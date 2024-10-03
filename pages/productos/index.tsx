@@ -1,5 +1,5 @@
 import ProductItem from '@/components/Products/ProductItem'
-import { Input, Tab, Tabs } from '@nextui-org/react'
+import { Input } from '@nextui-org/react'
 import ProductModal from '@/modals/Products/ProductModal'
 import React, { useEffect, useState } from 'react'
 import ListTabs from '@/components/Percent/ListTabs'
@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { Search } from 'react-feather'
 
 const Productos = () => {
-  const [selected, setSelected] = useState(1)
+  const [selected, setSelected] = useState<string | number>(0)
   const [percent, setPercent] = useState<any[]>([])
   const [products, setProducts] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -35,6 +35,8 @@ const Productos = () => {
       if (response.ok) {
         console.log('Datos de precios obtenidos exitosamente')
         const data = await response.json()
+        console.log(data);
+        
         setPercent(data)
       } else {
         console.error('Error al obtener datos de precios')
@@ -67,7 +69,7 @@ const Productos = () => {
     }
   }
 
-  const handleSelectionChange = (key: any) => {
+  const handleSelectionChange = (key: string | number) => {
     setSelected(key)
   }
 
@@ -78,6 +80,15 @@ const Productos = () => {
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const getPrice = (product: any, selectedList: string | number) => {
+    const listIndex = typeof selectedList === 'string' ? parseInt(selectedList) : selectedList;
+    return product.prices[listIndex] || product.prices[0]; // Si no hay precio en el índice seleccionado, usa el precio base
+  };
+  
+
+  console.log(products);
+  
 
   return (
     <div className='flex flex-col items-center justify-center'>
@@ -108,7 +119,7 @@ const Productos = () => {
         {filteredProducts.map((product, index) => (
           <ProductItem
             key={index}
-            price={product.prices[selected]}
+            price={getPrice(product, selected)}
             name={product.name}
             id={product._id}
             fetchData={getProducts}

@@ -27,7 +27,7 @@ const ListSelector: React.FC<ListSelectorProps> = ({ handle, selected, list }) =
       <PopoverContent>
         <div className="px-1 py-2 flex flex-col max-h-32 overflow-auto">
           {extendedList.map((item) => (
-            <div>
+            <div key={item.number}>
             <Button
               key={item.number}
               size='sm'

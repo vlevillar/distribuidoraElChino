@@ -27,7 +27,7 @@ interface Product {
 
 interface EditOrderResumeProps {
   selectedProducts: Product[]
-  selectedList: number
+  selectedList: number | null
   onProductsChange: (updatedProducts: Product[]) => void
   onTotalChange: (total: number) => void
 }
@@ -48,7 +48,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
   useEffect(() => {
     const total = selectedProducts.reduce((sum, product) => {
       const quantity = Number(quantities[product._id] || product.quantity)
-      const price = product.prices[selectedList]
+      const price = selectedList !== null ? product.prices[selectedList] : 0
       return sum + price * quantity
     }, 0)
     onTotalChange(total)
@@ -64,7 +64,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
       const selectedMeasurement =
         selectedKeyString === 'Kg.' ? 'kilogram' : 'unit'
 
-      const pxkg = product.prices[selectedList]
+      const pxkg = selectedList !== null ? product.prices[selectedList] : 0
 
       return {
         ...product,
@@ -73,7 +73,6 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
         selectedPrice: pxkg
       }
     })
-
   }, [selectedProducts, selectedKeys, quantities, selectedList])
 
   useEffect(() => {
@@ -151,12 +150,18 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
                 </DropdownMenu>
               </Dropdown>
             </TableCell>
-            <TableCell>{product.prices[selectedList].toFixed(2)}</TableCell>
             <TableCell>
-              {(
-                product.prices[selectedList] *
-                Number(quantities[product._id] || product.quantity)
-              ).toFixed(2)}
+              {selectedList !== null
+                ? product.prices[selectedList].toFixed(2)
+                : 'N/A'}
+            </TableCell>
+            <TableCell>
+              {selectedList !== null
+                ? (
+                    product.prices[selectedList] *
+                    Number(quantities[product._id] || product.quantity)
+                  ).toFixed(2)
+                : 'N/A'}
             </TableCell>
           </TableRow>
         ))}

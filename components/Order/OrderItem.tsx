@@ -3,12 +3,15 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  Divider
+  Divider,
+  Popover,
+  PopoverContent,
+  PopoverTrigger
 } from '@nextui-org/react'
 import DelOrderModal from '@/modals/Order/DeleteOrderModal'
 import ViewOrderResume from '@/modals/Order/ViewOrderResume'
 import EditOrderModal from '@/modals/Order/EditOrderModal'
-import { FileText, Printer } from 'react-feather'
+import { FileText, Info, Printer } from 'react-feather'
 import Link from 'next/link'
 
 interface Product {
@@ -27,7 +30,9 @@ interface Order {
   products: Product[]
   discount: string
   selectedList: number
-  date: string;
+  date: string
+  deliveryDate: string
+  description: string
 }
 
 interface OrderItemProps {
@@ -46,17 +51,45 @@ export default function OrderItem({
     return total + selectedPrice * product.quantity
   }, 0)
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+  }
+
   return (
     <Card className='max-w-[300px]'>
       <CardHeader className='flex items-center justify-center gap-3'>
-        <div className='flex flex-col'>
+        <div className='flex items-center justify-center gap-2'>
           <p className='text-md'>{order.clientName}</p>
+          {order.description ? (
+            <Popover placement='bottom'>
+              <PopoverTrigger className='cursor-pointer'>
+                <Info color='grey' size='20px' />
+              </PopoverTrigger>
+              <PopoverContent>
+                <div className='px-1 py-2'>
+                  <div className='text-small font-bold'>Descripción:</div>
+                  <div className='text-tiny'>{order.description}</div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : null}
         </div>
       </CardHeader>
       <Divider />
       <CardBody>
         <div className='flex flex-col items-center justify-center'>
-          <p className='text-small'>Fecha: {order.date.split('T')[0]}</p>
+          <p className='text-small'>
+            Fecha de creación: {formatDate(order.date)}
+          </p>
+          <p className='text-small'>
+            Fecha de entrega:{' '}
+            {order.deliveryDate ? order.deliveryDate : 'Sin especificar'}
+          </p>
           <ViewOrderResume
             orderData={order.products}
             selectedList={order.selectedList}

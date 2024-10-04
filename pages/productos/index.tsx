@@ -2,12 +2,13 @@ import ProductItem from '@/components/Products/ProductItem'
 import { Input } from '@nextui-org/react'
 import ProductModal from '@/modals/Products/ProductModal'
 import React, { useEffect, useState } from 'react'
-import ListTabs from '@/components/Percent/ListTabs'
+import ListTabs from '@/components/Percent/ListSelector'
 import { useRouter } from 'next/router'
 import { Search } from 'react-feather'
+import ListSelector from '@/components/Percent/ListSelector'
 
 const Productos = () => {
-  const [selected, setSelected] = useState<string | number>(0)
+  const [selected, setSelected] = useState<number | null>(null);
   const [percent, setPercent] = useState<any[]>([])
   const [products, setProducts] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -67,9 +68,10 @@ const Productos = () => {
     }
   }
 
-  const handleSelectionChange = (key: string | number) => {
-    setSelected(key)
-  }
+  const handleSelectionChange = (key: number) => {
+    setSelected(key);
+  };
+
 
   const handleProductCreated = () => {
     getProducts()
@@ -91,7 +93,7 @@ const Productos = () => {
           <>
             <ProductModal onProductCreated={handleProductCreated} />
             <div className='flex justify-center pt-2'>
-              <ListTabs
+              <ListSelector
                 handle={handleSelectionChange}
                 selected={selected}
                 list={percent}
@@ -113,7 +115,7 @@ const Productos = () => {
         {filteredProducts.map((product, index) => (
           <ProductItem
             key={index}
-            price={getPrice(product, selected)}
+            price={getPrice(product, selected ?? 0)} 
             name={product.name}
             id={product._id}
             fetchData={getProducts}

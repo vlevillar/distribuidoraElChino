@@ -20,6 +20,8 @@ interface Order {
   discount: string
   selectedList: number
   userId?: string // Añadido para manejar la asignación
+  deliveryDate: string
+  description: string
 }
 
 interface AddOrdersProps {

@@ -29,6 +29,8 @@ interface Order {
   products: Product[]
   discount: string
   selectedList: number
+  deliveryDate: string
+  description: string
 }
 
 interface OrderAdminItemProps {

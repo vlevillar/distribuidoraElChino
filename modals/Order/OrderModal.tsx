@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Modal,
   ModalContent,
@@ -9,11 +9,12 @@ import {
   useDisclosure,
   Input
 } from '@nextui-org/react'
-import { Calendar, Percent, PlusCircle } from 'react-feather'
+import { Info, Percent, PlusCircle } from 'react-feather'
 import SearchOrderClient from '@/components/Order/SearchOrderClient'
 import SearchOrderProduct from '@/components/Order/SearchOrderProduct'
 import OrderResume from '@/components/Order/OrderResume'
-import ListTabs from '@/components/Percent/ListTabs'
+import ListSelector from '@/components/Percent/ListSelector'
+import CalendarSelector from '@/components/Order/CalendarSelector'
 
 interface Client {
   _id: string
@@ -47,6 +48,8 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [discount, setDiscount] = useState('')
   const [total, setTotal] = useState(0)
   const [totalWithDiscount, setTotalWithDiscount] = useState(0)
+  const [deliveryDate, setDeliveryDate] = useState<string | null>(null)
+  const [description, setDescription] = useState('') // Estado para la descripción
 
   useEffect(() => {
     getPricesList()
@@ -103,11 +106,13 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     setDiscount('')
     setTotal(0)
     setTotalWithDiscount(0)
+    setDeliveryDate(null)
+    setDescription('') 
   }
 
-  const handleSelectionChange = (key: any) => {
+  const handleSelectionChange = useCallback((key: any) => {
     setSelected(key)
-  }
+  }, [])
 
   const handleTotalChange = (total: number) => {
     setTotal(total)
@@ -121,6 +126,10 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     } else {
       setTotalWithDiscount(total)
     }
+  }
+
+  const handleDateChange = (date: string) => {
+    setDeliveryDate(date); 
   }
 
   const handleCreateOrder = async () => {
@@ -148,7 +157,9 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       clientPhone: selectedClient.phone,
       products: transformedProducts,
       discount: discount,
-      selectedList: Number(selected)
+      selectedList: Number(selected),
+      deliveryDate,
+      description
     }
 
     try {
@@ -198,12 +209,20 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                 <SearchOrderProduct
                   onSelectedProductChange={handleSelectedProductChange}
                 />
+                <Input 
+                  label='Descripción' 
+                  placeholder='Ingresar descripción (opcional)' 
+                  endContent={<Info/>} 
+                  className='py-1'
+                  onChange={e => setDescription(e.target.value)} 
+                />
                 <div className='flex justify-between z-10'>
-                  <ListTabs
+                  <ListSelector
                     handle={handleSelectionChange}
                     selected={selected}
                     list={percent}
                   />
+                  <CalendarSelector onDateChange={handleDateChange}/>
                 </div>
                 <OrderResume
                   selectedProducts={selectedProducts}

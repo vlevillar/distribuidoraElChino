@@ -9,11 +9,12 @@ import {
   useDisclosure,
   Input
 } from '@nextui-org/react';
-import { Percent } from 'react-feather';
+import { Info, Percent } from 'react-feather';
 import SearchOrderClient from '@/components/Order/SearchOrderClient';
 import SearchOrderProduct from '@/components/Order/SearchOrderProduct';
-import ListTabs from '@/components/Percent/ListTabs';
 import EditOrderResume from '@/components/Order/EditOrderResume';
+import ListSelector from '@/components/Percent/ListSelector';
+import CalendarSelector from '@/components/Order/CalendarSelector';
 
 interface Client {
   _id: string;
@@ -42,6 +43,8 @@ interface Order {
   products: Product[];
   discount: string;
   selectedList: number;
+  deliveryDate: string;
+  description: string;
 }
 
 interface EditOrderModalProps {
@@ -54,10 +57,12 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
   const [percent, setPercent] = useState<any[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
   const [discount, setDiscount] = useState('');
+  const [description, setDescription] = useState(''); // Estado para la descripción
   const [total, setTotal] = useState(0);
   const [totalWithDiscount, setTotalWithDiscount] = useState(0);
+  const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
 
   const memoizedSelectedProducts = useMemo(() => selectedProducts, [selectedProducts.map(p => p._id).join(',')]);
 
@@ -102,6 +107,8 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
       setDiscount(order.discount);
       setSelected(order.selectedList);
       calculateTotalWithDiscount();
+      setDescription(order.description); // Inicializa el estado de descripción
+      setDeliveryDate(order.deliveryDate); // Inicializa la fecha de entrega
     }
   }, [order, isOpen]);
 
@@ -118,6 +125,10 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
     setSelectedProducts(updatedProducts);
   };
 
+  const handleDateChange = (date: string) => {
+    setDeliveryDate(date); 
+  }
+
   const handleSelectedProductSearchChange = useCallback((products: Product[]) => {
     setSelectedProducts(prevProducts => {
       return products.map(newProduct => {
@@ -127,8 +138,8 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
     });
   }, []);
 
-  const handleSelectionChange = (key: any) => {
-    console.log('Setting selected from ListTabs:', key);
+  const handleSelectionChange = (key: number) => {
+    console.log('Setting selected from ListSelector:', key);
     setSelected(key);
   };
 
@@ -163,7 +174,9 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
       clientNumber: selectedClient.clientNumber,
       products: transformedProducts,
       discount: discount,
-      selectedList: Number(selected)
+      selectedList: Number(selected),
+      deliveryDate,
+      description, // Asegúrate de incluir la descripción en el objeto de datos
     };
 
     try {
@@ -207,23 +220,32 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
               </ModalHeader>
               <ModalBody>
                 <div className='flex-col'>
-                <SearchOrderClient
-                  onSelectedClientsChange={handleSelectedClientChange}
-                  initialClient={selectedClient}
-                />
-                    </div>
-                <div className='flex-col'>
-                <SearchOrderProduct
-                  onSelectedProductChange={handleSelectedProductSearchChange}
-                  initialProducts={memoizedSelectedProducts}
-                />
+                  <SearchOrderClient
+                    onSelectedClientsChange={handleSelectedClientChange}
+                    initialClient={selectedClient}
+                  />
                 </div>
-                <div className='flex-row'>
-                <ListTabs
-                  handle={handleSelectionChange}
-                  selected={selected}
-                  list={percent}
+                <div className='flex-col'>
+                  <SearchOrderProduct
+                    onSelectedProductChange={handleSelectedProductSearchChange}
+                    initialProducts={memoizedSelectedProducts}
+                  />
+                </div>
+                <Input
+                  label='Descripción' 
+                  placeholder='Ingresar descripción (opcional)'
+                  className='py-1' 
+                  endContent={<Info/>} 
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
                 />
+                <div className='flex justify-between z-10'>
+                  <ListSelector
+                    handle={handleSelectionChange}
+                    selected={selected}
+                    list={percent}
+                  />
+                  <CalendarSelector onDateChange={handleDateChange} initialDate={order.deliveryDate}/>
                 </div>
                 <EditOrderResume
                   selectedProducts={selectedProducts}

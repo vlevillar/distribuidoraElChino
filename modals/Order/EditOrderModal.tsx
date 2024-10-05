@@ -57,13 +57,13 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
   const [percent, setPercent] = useState<any[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [selected, setSelected] = useState<number | null>(null);
   const [discount, setDiscount] = useState('');
   const [description, setDescription] = useState(''); // Estado para la descripción
   const [total, setTotal] = useState(0);
   const [totalWithDiscount, setTotalWithDiscount] = useState(0);
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false)
+  const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1);
 
   const memoizedSelectedProducts = useMemo(() => selectedProducts, [selectedProducts.map(p => p._id).join(',')]);
 

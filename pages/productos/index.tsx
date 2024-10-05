@@ -6,12 +6,16 @@ import { useRouter } from 'next/router'
 import { Search } from 'react-feather'
 import ListSelector from '@/components/Percent/ListSelector'
 
+interface PriceItem {
+  number: number;
+}
+
 const Productos = () => {
-  const [selected, setSelected] = useState<number | null>(null)
   const [percent, setPercent] = useState<any[]>([])
   const [products, setProducts] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [isAdmin, setIsAdmin] = React.useState(false)
+  const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1);
   const router = useRouter()
 
   useEffect(() => {
@@ -34,8 +38,13 @@ const Productos = () => {
       })
       if (response.ok) {
         console.log('Datos de precios obtenidos exitosamente')
-        const data = await response.json()
-        setPercent(data)
+        const data: PriceItem[] = await response.json(); // Asegúrate de que `data` tenga el tipo correcto
+        if (isAdmin) {
+          setPercent(data);
+        } else {
+          const filteredData = data.filter((item: PriceItem) => item.number === 1 || item.number === 2);
+          setPercent(filteredData);
+        }
       } else {
         console.error('Error al obtener datos de precios')
       }
@@ -80,10 +89,14 @@ const Productos = () => {
   )
 
   const getPrice = (product: any, selectedList: string | number) => {
+    console.log('Precios del producto:', product.prices); // Verifica los precios
     const listIndex =
-      typeof selectedList === 'string' ? parseInt(selectedList) : selectedList
-    return product.prices[listIndex] || product.prices[0]
-  }
+      typeof selectedList === 'string' ? parseInt(selectedList) : selectedList;
+      
+    // Asegúrate de que listIndex tenga el valor correcto
+    console.log('Índice de lista seleccionado:', listIndex); // Verifica el índice seleccionado
+    return product.prices[listIndex] || product.prices[0];
+}
 
   return (
     <div className='flex flex-col items-center justify-center'>

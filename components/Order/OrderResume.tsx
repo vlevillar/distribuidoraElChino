@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'react'
 import {
   Button,
   Dropdown,
@@ -12,24 +12,24 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  Selection,
-} from '@nextui-org/react';
+  Selection
+} from '@nextui-org/react'
 
 interface Product {
-  _id: string;
-  code?: string;
-  name: string;
-  prices: number[];
-  quantity: number;
-  selectedMeasurement?: string;
-  selectedPrice?: number;
+  _id: string
+  code?: string
+  name: string
+  prices: number[]
+  quantity: number
+  selectedMeasurement?: string
+  selectedPrice?: number
 }
 
 interface OrderResumeProps {
-  selectedProducts: Product[];
-  selectedList: number;
-  onTotalChange: (total: number) => void;
-  onProductsChange: (updatedProducts: Product[]) => void;
+  selectedProducts: Product[]
+  selectedList: number | null
+  onTotalChange: (total: number) => void
+  onProductsChange: (updatedProducts: Product[]) => void
 }
 
 const OrderResume: React.FC<OrderResumeProps> = ({
@@ -38,43 +38,52 @@ const OrderResume: React.FC<OrderResumeProps> = ({
   onTotalChange,
   onProductsChange
 }) => {
-  const [selectedKeys, setSelectedKeys] = React.useState<{ [key: string]: Selection }>({});
+  const [selectedKeys, setSelectedKeys] = React.useState<{
+    [key: string]: Selection
+  }>({})
 
   useEffect(() => {
-    calculateTotal();
-  }, [selectedProducts, selectedList]);
+    calculateTotal()
+  }, [selectedProducts, selectedList])
 
   const handleQuantityChange = (id: string, value: string) => {
-    console.log('Changing quantity:', id, value);
-    const numValue = Number(value);
+    console.log('Changing quantity:', id, value)
+    const numValue = Number(value)
     if (!isNaN(numValue)) {
       const updatedProducts = selectedProducts.map(product =>
         product._id === id ? { ...product, quantity: numValue } : product
-      );
-      onProductsChange(updatedProducts);
+      )
+      onProductsChange(updatedProducts)
     }
-  };
+  }
 
   const handleSelectionChange = (id: string, keys: Selection) => {
-    setSelectedKeys(prev => ({ ...prev, [id]: keys }));
-    const selectedKey = Array.from(keys)[0] as string;
+    setSelectedKeys(prev => ({ ...prev, [id]: keys }))
+    const selectedKey = Array.from(keys)[0] as string
     const updatedProducts = selectedProducts.map(product =>
-      product._id === id ? { ...product, selectedMeasurement: selectedKey === 'Kg.' ? 'kilogram' : 'unit' } : product
-    );
-    onProductsChange(updatedProducts);
-  };
+      product._id === id
+        ? {
+            ...product,
+            selectedMeasurement: selectedKey === 'Kg.' ? 'kilogram' : 'unit'
+          }
+        : product
+    )
+    onProductsChange(updatedProducts)
+  }
 
   const calculateTotal = () => {
     const total = selectedProducts.reduce((sum, product) => {
-      const price = product.prices[selectedList];
-      return sum + price * product.quantity;
-    }, 0);
-    onTotalChange(total);
-  };
+      const price = product.prices[selectedList ?? 0]
+      return sum + price * product.quantity
+    }, 0)
+    onTotalChange(total)
+  }
 
   const getSelectedValue = (id: string) => {
-    return Array.from(selectedKeys[id] || new Set(['Kg.'])).join(', ').replaceAll('_', ' ');
-  };
+    return Array.from(selectedKeys[id] || new Set(['Kg.']))
+      .join(', ')
+      .replaceAll('_', ' ')
+  }
 
   return (
     <Table removeWrapper aria-label='Products table'>
@@ -86,15 +95,17 @@ const OrderResume: React.FC<OrderResumeProps> = ({
         <TableColumn>Total</TableColumn>
       </TableHeader>
       <TableBody>
-        {selectedProducts?.map((product) => (
+        {selectedProducts?.map(product => (
           <TableRow key={product._id}>
             <TableCell>{product.name}</TableCell>
             <TableCell>
               <Input
-                placeholder="0.00"
-                variant="underlined"
+                placeholder='0.00'
+                variant='underlined'
                 value={product.quantity.toString()}
-                onValueChange={(value) => handleQuantityChange(product._id, value)}
+                onValueChange={value =>
+                  handleQuantityChange(product._id, value)
+                }
               />
             </TableCell>
             <TableCell>
@@ -110,20 +121,30 @@ const OrderResume: React.FC<OrderResumeProps> = ({
                   disallowEmptySelection
                   selectionMode='single'
                   selectedKeys={selectedKeys[product._id] || new Set(['Kg.'])}
-                  onSelectionChange={(keys) => handleSelectionChange(product._id, keys)}
+                  onSelectionChange={keys =>
+                    handleSelectionChange(product._id, keys)
+                  }
                 >
                   <DropdownItem key='Kg.'>KG</DropdownItem>
                   <DropdownItem key='U.'>U.</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </TableCell>
-            <TableCell>{product.prices[selectedList].toFixed(2)}</TableCell>
-            <TableCell>{(product.prices[selectedList] * product.quantity).toFixed(2)}</TableCell>
+            <TableCell>
+              {selectedList !== null
+                ? product.prices[selectedList].toFixed(2)
+                : 'N/A'}
+            </TableCell>
+            <TableCell>
+              {selectedList !== null
+                ? (product.prices[selectedList] * product.quantity).toFixed(2)
+                : 'N/A'}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  );
-};
+  )
+}
 
-export default OrderResume;
+export default OrderResume

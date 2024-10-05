@@ -63,6 +63,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
   const [total, setTotal] = useState(0);
   const [totalWithDiscount, setTotalWithDiscount] = useState(0);
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const memoizedSelectedProducts = useMemo(() => selectedProducts, [selectedProducts.map(p => p._id).join(',')]);
 
@@ -109,6 +110,8 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
       calculateTotalWithDiscount();
       setDescription(order.description); // Inicializa el estado de descripción
       setDeliveryDate(order.deliveryDate); // Inicializa la fecha de entrega
+      const admin = localStorage.getItem('role')
+      setIsAdmin(admin === 'admin')
     }
   }, [order, isOpen]);
 
@@ -241,6 +244,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
                 />
                 <div className='flex justify-between z-10'>
                   <ListSelector
+                  isAdmin={isAdmin}
                     handle={handleSelectionChange}
                     selected={selected}
                     list={percent}

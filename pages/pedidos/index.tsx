@@ -45,7 +45,7 @@ const Pedidos = () => {
         console.error('No se encontró el token de acceso')
         return
       }
-      const response = await fetch(`${process.env.API_URL}/orders/all`, {
+      const response = await fetch(isAdmin ? `${process.env.API_URL}/orders/all` : `${process.env.API_URL}/orders`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${accessToken}`
@@ -99,11 +99,9 @@ const Pedidos = () => {
 
   return (
     <div className='flex flex-col items-center justify-center'>
-      {isAdmin && (
         <div className='flex flex-col pb-4'>
           <OrderModal onSuccess={fetchOrders} />
         </div>
-      )}
       <div className='flex justify-between gap-3 pb-4'>
         <div>
           <CalendarFilter

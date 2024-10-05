@@ -5,9 +5,10 @@ interface ListSelectorProps {
   handle: (key: number) => void;
   selected: number | null;
   list: Array<{ number: number }>;
+  isAdmin: boolean;
 }
 
-const ListSelector: React.FC<ListSelectorProps> = ({ handle, selected, list }) => {
+const ListSelector: React.FC<ListSelectorProps> = ({ handle, selected, list, isAdmin }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = (number: number) => {
@@ -15,7 +16,9 @@ const ListSelector: React.FC<ListSelectorProps> = ({ handle, selected, list }) =
     setIsOpen(false);
   };
 
-  const extendedList = [{ number: 0 }, ...list];
+  const extendedList = isAdmin
+    ? [{ number: 0 }, ...list]
+    : list.filter(item => item.number === 1 || item.number === 2);
 
   return (
     <Popover isOpen={isOpen} onOpenChange={(open) => setIsOpen(open)} placement='bottom'>

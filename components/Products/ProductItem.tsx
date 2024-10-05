@@ -22,17 +22,21 @@ export default function ProductItem( { price, name, id, code, measurement, fetch
                     <p className="text-md">{name}</p>
                 </div>
             </CardHeader>
-            {isAdmin && fetchData ?
+            {fetchData ?
             <>
             <Divider />
                 <CardBody className='flex items-center'>
                     <p>${price}</p>
                 </CardBody>
+            {isAdmin ? 
+            <> 
             <Divider />
             <CardFooter className='flex gap-3 justify-center items-center'>
                  <EditProduct  product={product} fetchData={fetchData}/>
                 <DelProductModal name={name} id={id} fetchData={fetchData}/>
             </CardFooter>
+            </>
+            : null}
            </>
         : null}
         </Card>

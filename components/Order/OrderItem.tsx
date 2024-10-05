@@ -95,15 +95,15 @@ export default function OrderItem({
             selectedList={order.selectedList}
           />
           <p>Total: ${totalPrice.toFixed(2)}</p>
-          <div className='mt-2 flex justify-around gap-6'>
-            <Link
-              href={`${process.env.API_URL}/orders/${order._id}`}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              <Printer className='cursor-pointer' />
-            </Link>
-            {isAdmin && (
+          {isAdmin && (
+            <div className='mt-2 flex justify-around gap-6'>
+              <Link
+                href={`${process.env.API_URL}/orders/${order._id}`}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <Printer className='cursor-pointer' />
+              </Link>
               <Link
                 href={`${process.env.API_URL}/remits/${order._id}`}
                 target='_blank'
@@ -111,11 +111,11 @@ export default function OrderItem({
               >
                 <FileText className='cursor-pointer' />
               </Link>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </CardBody>
-      {fetchData && isAdmin ? (
+      {fetchData ? (
         <>
           <Divider />
           <CardFooter className='flex items-center justify-center gap-3'>

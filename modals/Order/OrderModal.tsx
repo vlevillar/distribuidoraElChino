@@ -45,6 +45,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
   const [selected, setSelected] = useState(0)
+  const [isAdmin, setIsadmin] = useState(false)
   const [discount, setDiscount] = useState('')
   const [total, setTotal] = useState(0)
   const [totalWithDiscount, setTotalWithDiscount] = useState(0)
@@ -53,6 +54,8 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
 
   useEffect(() => {
     getPricesList()
+    const admin = localStorage.getItem('role') === "admin"
+    setIsadmin(admin)
   }, [])
 
   useEffect(() => {
@@ -221,6 +224,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                     handle={handleSelectionChange}
                     selected={selected}
                     list={percent}
+                    isAdmin={isAdmin}
                   />
                   <CalendarSelector onDateChange={handleDateChange}/>
                 </div>

@@ -38,6 +38,19 @@ const Pedidos = () => {
   const router = useRouter()
   const [isAdmin, setIsAdmin] = useState(false)
 
+  console.log(isAdmin);
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken')
+    const admin = localStorage.getItem('role')
+    setIsAdmin(admin === 'admin')
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso')
+      router.push('/')
+      return
+    }
+    fetchOrders()
+  }, [isAdmin])
+
   const fetchOrders = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken')
@@ -61,18 +74,6 @@ const Pedidos = () => {
       console.error('Error al obtener las órdenes:', error)
     }
   }
-
-  useEffect(() => {
-    fetchOrders()
-    const accessToken = localStorage.getItem('accessToken')
-    const admin = localStorage.getItem('role')
-    setIsAdmin(admin === 'admin')
-    if (!accessToken) {
-      console.error('No se encontró el token de acceso')
-      router.push('/')
-      return
-    }
-  }, [])
 
   const filteredOrders = orders.filter(order => {
     // Filtrar por nombre de cliente

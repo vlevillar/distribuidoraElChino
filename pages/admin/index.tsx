@@ -6,6 +6,7 @@ import AddOrder from '@/views/Admin/AddOrder'
 import AddRoute from '@/views/Admin/AddRoute'
 import AddClients from '@/views/Admin/AddClients'
 import useAdminData from '@/hooks/UseAdminData'
+import DelUserModal from '@/modals/Admin/DeleteUserModal'
 
 export default function Admin() {
   const {
@@ -22,7 +23,8 @@ export default function Admin() {
     setUserOrders,
     userOrders,
     setUserProducts,
-    userProducts
+    userProducts,
+    setUsers
   } = useAdminData()
 
   const handleOrderAssignmentChange = (
@@ -59,6 +61,26 @@ export default function Admin() {
     setUserClients(newUserClients)
   }
 
+  const fetchData = async () => {
+    const accessToken = localStorage.getItem('accessToken');
+    try {
+      const response = await fetch(`${process.env.API_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const selectedUser = users.find(user => user._id === selectedUserId)
+
   const tabComponents: { [key: string]: JSX.Element } = {
     clients: (
       <AddClients
@@ -88,9 +110,15 @@ export default function Admin() {
   }
 
   return (
-    <div className='flex-col items-center justify-center gap-2'>
+    <div className='flex-col items-center justify-center gap-2 text-center'>
       <AdminTabs selected={selected} setSelected={setSelected} />
       <SelectUser users={users} onUserSelect={setSelectedUserId} />
+      <div className='flex gap-2 items-center text-center justify-center mt-2'>
+      <p className='text-sm text-gray-500 mt-1'>
+        {selectedUser ? `Nombre de usuario: ${selectedUser.username}` : 'No se ha seleccionado un usuario'}
+      </p>
+      <DelUserModal name={selectedUser?.name} id={selectedUser?._id} fetchData={fetchData}/>
+      </div>
       <div className='mt-2 flex items-center justify-center'>
         {tabComponents[selected]}
       </div>

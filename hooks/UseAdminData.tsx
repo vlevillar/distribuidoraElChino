@@ -134,6 +134,7 @@ const useAdminData = () => {
     selected,
     selectedUserId,
     setSelected,
+    setUsers,
     setUserClients,
     setUserOrders,
     setUserProducts,

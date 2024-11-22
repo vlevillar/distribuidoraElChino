@@ -101,7 +101,7 @@ export default function SearchOrderClient({ onSelectedClientsChange, initialClie
   };
   
   return (
-    <Card className="max-w-[400px]">
+    <Card className="w-full">
       <CardHeader className="flex gap-3">
         <Input
           placeholder="Buscar cliente"

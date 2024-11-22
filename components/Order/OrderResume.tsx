@@ -14,6 +14,7 @@ import {
   TableRow,
   Selection
 } from '@nextui-org/react'
+import EditProductPrice from '@/modals/Order/EditProductPrice'
 
 interface Product {
   _id: string
@@ -23,20 +24,23 @@ interface Product {
   quantity: number
   selectedMeasurement?: string
   selectedPrice?: number
+  basePrices?: number[];
 }
 
 interface OrderResumeProps {
-  selectedProducts: Product[]
-  selectedList: number | null
-  onTotalChange: (total: number) => void
-  onProductsChange: (updatedProducts: Product[]) => void
+  selectedProducts: Product[];
+  selectedList: number | null;
+  onTotalChange: (total: number) => void;
+  onProductsChange: (updatedProducts: Product[]) => void;
+  onUpdatePrice: (productId: string, newPrice: number) => void;
 }
 
 const OrderResume: React.FC<OrderResumeProps> = ({
   selectedProducts,
   selectedList,
   onTotalChange,
-  onProductsChange
+  onProductsChange,
+  onUpdatePrice
 }) => {
   const [selectedKeys, setSelectedKeys] = React.useState<{
     [key: string]: Selection
@@ -63,9 +67,9 @@ const OrderResume: React.FC<OrderResumeProps> = ({
     const updatedProducts = selectedProducts.map(product =>
       product._id === id
         ? {
-            ...product,
-            selectedMeasurement: selectedKey === 'Kg.' ? 'kilogram' : 'unit'
-          }
+          ...product,
+          selectedMeasurement: selectedKey === 'Kg.' ? 'kilogram' : 'unit'
+        }
         : product
     )
     onProductsChange(updatedProducts)
@@ -91,7 +95,7 @@ const OrderResume: React.FC<OrderResumeProps> = ({
         <TableColumn>Nombre</TableColumn>
         <TableColumn>Cantidad</TableColumn>
         <TableColumn>KG/U</TableColumn>
-        <TableColumn>PxKG/U</TableColumn>
+        <TableColumn>$xKG/U</TableColumn>
         <TableColumn>Total</TableColumn>
       </TableHeader>
       <TableBody>
@@ -132,7 +136,16 @@ const OrderResume: React.FC<OrderResumeProps> = ({
             </TableCell>
             <TableCell>
               {selectedList !== null
-                ? product.prices[selectedList].toFixed(2)
+                ?
+                <EditProductPrice
+                  initialPrice={
+                    product.basePrices && selectedList !== null
+                      ? product.basePrices[selectedList] // Precio base como número
+                      : product.prices[selectedList]
+                  }
+                  onUpdatePrice={(newPrice) => onUpdatePrice(product._id, newPrice)}
+                />
+
                 : 'N/A'}
             </TableCell>
             <TableCell>

@@ -33,6 +33,7 @@ interface Product {
   quantity: number
   selectedMeasurement?: string
   selectedPrice?: number
+  basePrices?: number[]
 }
 
 interface OrderModalProps {
@@ -90,14 +91,21 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   }
 
   const handleSelectedProductChange = (newProducts: Product[]) => {
-    setSelectedProducts(prevProducts => {
-      return newProducts.map(newProduct => {
-        const existingProduct = prevProducts.find(p => p._id === newProduct._id);
-        return existingProduct ? { ...newProduct, quantity: existingProduct.quantity } : newProduct;
-      });
-    });
-  };
-
+    setSelectedProducts((prevProducts) =>
+      newProducts.map((newProduct) => {
+        const existingProduct = prevProducts.find((p) => p._id === newProduct._id);
+        return existingProduct
+          ? {
+              ...newProduct,
+              prices: existingProduct.prices,
+              basePrices: existingProduct.basePrices || [...newProduct.prices], // Usar basePrices existente o inicializarlo
+              quantity: existingProduct.quantity,
+            }
+          : { ...newProduct, basePrices: [...newProduct.prices] }; // Inicializar basePrices si es nuevo
+      })
+    );
+  };  
+  
   const handleProductsChange = (updatedProducts: Product[]) => {
     console.log('Updating products:', updatedProducts);
     setSelectedProducts(updatedProducts);
@@ -134,6 +142,21 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const handleDateChange = (date: string) => {
     setDeliveryDate(date); 
   }
+
+  const handleUpdateProductPrice = (productId: string, newPrice: number) => {
+    setSelectedProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product._id === productId
+          ? {
+              ...product,
+              prices: product.prices.map((price, index) =>
+                index === (selected ?? 0) ? newPrice : price
+              ),
+            }
+          : product
+      )
+    );
+  };  
 
   const handleCreateOrder = async () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -198,7 +221,9 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
         onClose={handleClose}
         onOpenChange={onOpenChange}
         placement='top-center'
-      >
+        size='xl'
+        scrollBehavior='outside'
+>
         <ModalContent>
           {onClose => (
             <>
@@ -233,6 +258,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                   selectedList={selected}
                   onTotalChange={handleTotalChange}
                   onProductsChange={handleProductsChange}
+                  onUpdatePrice={handleUpdateProductPrice}
                 />
                 <div className='flex justify-end'>
                   <div>

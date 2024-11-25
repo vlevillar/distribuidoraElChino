@@ -20,6 +20,7 @@ interface Product {
   name: string;
   prices: number[];
   quantity: number;
+  units?: number
   measurement: string;
 }
 

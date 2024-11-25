@@ -38,7 +38,6 @@ const Pedidos = () => {
   const router = useRouter()
   const [isAdmin, setIsAdmin] = useState(false)
 
-  console.log(isAdmin);
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken')
     const admin = localStorage.getItem('role')

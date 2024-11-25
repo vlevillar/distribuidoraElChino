@@ -26,16 +26,25 @@ interface Product {
 
 interface Order {
   _id: string
-  clientName: string
   clientId: string
+  clientName: string
   clientNumber: number
-  products: Product[]
+  products: {
+    _id: string
+    name: string
+    prices: number[]
+    quantity: number
+    measurement: string
+  }[]
   discount: string
-  selectedList: number
-  date: string
+  date: string 
   deliveryDate: string
+  documentNumber: number
+  type: string
+  selectedList: number
   description: string
 }
+
 
 interface OrderItemProps {
   order: Order

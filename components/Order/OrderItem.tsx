@@ -19,6 +19,8 @@ interface Product {
   name: string
   prices: number[]
   quantity: number
+  units: number
+  discount: number
   measurement: string
 }
 

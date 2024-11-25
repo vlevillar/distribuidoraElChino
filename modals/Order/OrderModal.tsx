@@ -31,7 +31,7 @@ interface Product {
   name: string
   prices: number[]
   quantity: number
-  selectedMeasurement?: string
+  units?: number
   selectedPrice?: number
   basePrices?: number[]
 }
@@ -91,25 +91,58 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   }
 
   const handleSelectedProductChange = (newProducts: Product[]) => {
-    setSelectedProducts((prevProducts) =>
-      newProducts.map((newProduct) => {
-        const existingProduct = prevProducts.find((p) => p._id === newProduct._id);
+    setSelectedProducts((prevProducts) => {
+      const updatedProducts = newProducts.map((newProduct) => {
+        const existingProduct = prevProducts.find(
+          (p) => p._id === newProduct._id
+        );
         return existingProduct
           ? {
               ...newProduct,
               prices: existingProduct.prices,
-              basePrices: existingProduct.basePrices || [...newProduct.prices], // Usar basePrices existente o inicializarlo
+              basePrices:
+                existingProduct.basePrices || [...newProduct.prices],
               quantity: existingProduct.quantity,
+              units: existingProduct.units,
             }
-          : { ...newProduct, basePrices: [...newProduct.prices] }; // Inicializar basePrices si es nuevo
-      })
-    );
-  };  
+          : { ...newProduct, basePrices: [...newProduct.prices] };
+      });
   
-  const handleProductsChange = (updatedProducts: Product[]) => {
-    console.log('Updating products:', updatedProducts);
-    setSelectedProducts(updatedProducts);
+      // Verifica si los arrays realmente son diferentes
+      if (
+        JSON.stringify(prevProducts) === JSON.stringify(updatedProducts)
+      ) {
+        return prevProducts; // No actualices el estado si no hay cambios
+      }
+  
+      return updatedProducts;
+    });
   };
+  
+  
+  const handleTotalChange = useCallback((total: number) => {
+    setTotal(total);
+}, []);
+
+const handleProductsChange = useCallback((updatedProducts: Product[]) => {
+    setSelectedProducts(updatedProducts);
+}, []);
+
+const handleUpdateProductPrice = useCallback((productId: string, newPrice: number) => {
+    setSelectedProducts((prevProducts) =>
+        prevProducts.map((product) =>
+            product._id === productId
+                ? {
+                      ...product,
+                      prices: product.prices.map((price, index) =>
+                          index === (selected ?? 0) ? newPrice : price
+                      ),
+                  }
+                : product
+        )
+    );
+}, [selected]);
+
 
   const handleClose = () => {
     setSelectedClient(null)
@@ -125,10 +158,6 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     setSelected(key)
   }, [])
 
-  const handleTotalChange = (total: number) => {
-    setTotal(total)
-  }
-
   const calculateTotalWithDiscount = () => {
     const discountValue = parseFloat(discount)
     if (!isNaN(discountValue)) {
@@ -142,21 +171,6 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const handleDateChange = (date: string) => {
     setDeliveryDate(date); 
   }
-
-  const handleUpdateProductPrice = (productId: string, newPrice: number) => {
-    setSelectedProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product._id === productId
-          ? {
-              ...product,
-              prices: product.prices.map((price, index) =>
-                index === (selected ?? 0) ? newPrice : price
-              ),
-            }
-          : product
-      )
-    );
-  };  
 
   const handleCreateOrder = async () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -174,6 +188,9 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       quantity: product.quantity,
       code: String(product.code)
     }))
+
+    console.log(transformedProducts);
+    
 
     const orderData = {
       clientId: selectedClient._id,

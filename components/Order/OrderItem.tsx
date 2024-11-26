@@ -32,6 +32,7 @@ interface Order {
   products: {
     _id: string
     name: string
+    units: number
     prices: number[]
     quantity: number
     measurement: string
@@ -58,9 +59,17 @@ export default function OrderItem({
   isAdmin
 }: OrderItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
-    const selectedPrice = product.prices[order.selectedList]
-    return total + selectedPrice * product.quantity
-  }, 0)
+    const selectedPrice = product.prices[order.selectedList];
+  
+    // Determinar cantidad basada en el tipo de medición
+    const amount =
+      product.measurement === 'unit' ? product.quantity : (product.units ?? product.quantity);
+  
+    // Sumar el total para este producto
+    return total + selectedPrice * amount;
+  }, 0);
+  
+console.log(order);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)

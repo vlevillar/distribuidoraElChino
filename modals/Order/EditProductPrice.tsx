@@ -22,11 +22,12 @@ export default function EditProductPrice({
 }: EditProductPriceProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [percentage, setPercentage] = useState<number>(0);
-  const [isAdding, setIsAdding] = useState<boolean>(false); // Estado para controlar si suma o resta
+  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const roundedInitialPrice = parseFloat(initialPrice.toFixed(2));
 
   const finalPrice = isAdding
-    ? initialPrice + (initialPrice * percentage) / 100
-    : initialPrice - (initialPrice * percentage) / 100;
+    ? roundedInitialPrice + (roundedInitialPrice * percentage) / 100
+    : roundedInitialPrice - (roundedInitialPrice * percentage) / 100;
 
   const handleUpdate = () => {
     onUpdatePrice(finalPrice);
@@ -40,7 +41,7 @@ export default function EditProductPrice({
   return (
     <>
       <Button onPress={onOpen} variant="light">
-        ${initialPrice} {percentage ? (isAdding ? `+ ${percentage}%` : `- ${percentage}%`) : null}
+        ${roundedInitialPrice} {percentage ? (isAdding ? `+ ${percentage}%` : `- ${percentage}%`) : null}
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
@@ -54,7 +55,7 @@ export default function EditProductPrice({
                   <label>Precio Base:</label>
                   <Input
                     type="number"
-                    value={initialPrice.toString()}
+                    value={roundedInitialPrice.toString()}
                     startContent={<DollarSign />}
                     readOnly
                   />

@@ -26,14 +26,16 @@ interface Client {
 }
 
 interface Product {
-  _id: string;
-  code?: string;
-  name: string;
-  prices: number[];
-  quantity: number;
+  _id: string
+  code?: string
+  name: string
+  prices: number[]
+  quantity: number
+  selectedMeasurement?: string
+  basePrices?: number[]
+  measurement?: string
   units?: number
-  selectedMeasurement?: string;
-  selectedPrice?: number;
+  selectedPrice?: number
 }
 
 interface Order {
@@ -59,7 +61,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [discount, setDiscount] = useState('');
-  const [description, setDescription] = useState(''); // Estado para la descripción
+  const [description, setDescription] = useState(''); 
   const [total, setTotal] = useState(0);
   const [totalWithDiscount, setTotalWithDiscount] = useState(0);
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
@@ -161,50 +163,74 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
     }
   };
 
-  const handleUpdateOrder = async () => {
-    if (!selectedClient || selectedProducts.length === 0) {
-      console.error('Client or products not selected');
-      return;
-    }
+  const handleUpdateProductPrice = useCallback((productId: string, newPrice: number) => {
+    setSelectedProducts((prevProducts) =>
+        prevProducts.map((product) =>
+            product._id === productId
+                ? {
+                      ...product,
+                      prices: product.prices.map((price, index) =>
+                          index === (selected ?? 0) ? newPrice : price
+                      ),
+                  }
+                : product
+        )
+    );
+}, [selected]);
 
-    const transformedProducts = selectedProducts.map(product => ({
+const handleUpdateOrder = async () => {
+  if (!selectedClient || selectedProducts.length === 0) {
+    console.error('Client or products not selected');
+    return;
+  }
+
+  const transformedProducts = selectedProducts.map(product => {
+    const isByWeight = product.measurement !== 'unit';
+    const amount = isByWeight
+      ? product.units ?? 0 // Usa `weight` si es por peso
+      : product.quantity;   // Usa `quantity` si es por unidad
+
+    return {
       ...product,
-      code: String(product.code)
-    }));
-
-    const orderData = {
-      clientId: selectedClient._id,
-      clientName: selectedClient.name,
-      clientNumber: selectedClient.clientNumber,
-      products: transformedProducts,
-      discount: discount,
-      selectedList: Number(selected),
-      deliveryDate,
-      description, // Asegúrate de incluir la descripción en el objeto de datos
+      total: product.prices[selected ?? 0] * amount, // Calcula el total correctamente
+      code: String(product.code), // Asegúrate de transformar el código en string si es necesario
     };
+  });
 
-    try {
-      const accessToken = localStorage.getItem('accessToken');
-      const response = await fetch(`${process.env.API_URL}/orders/${order._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      if (response.ok) {
-        console.log('Order updated successfully');
-        onClose();
-        onSuccess();
-      } else {
-        console.error('Error updating order');
-      }
-    } catch (error) {
-      console.error('Error updating order:', error);
-    }
+  const orderData = {
+    clientId: selectedClient._id,
+    clientName: selectedClient.name,
+    clientNumber: selectedClient.clientNumber,
+    products: transformedProducts,
+    discount: discount,
+    selectedList: Number(selected),
+    deliveryDate,
+    description,
   };
+
+  try {
+    const accessToken = localStorage.getItem('accessToken');
+    const response = await fetch(`${process.env.API_URL}/orders/${order._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (response.ok) {
+      console.log('Order updated successfully');
+      onClose();
+      onSuccess();
+    } else {
+      console.error('Error updating order');
+    }
+  } catch (error) {
+    console.error('Error updating order:', error);
+  }
+};
+
 
   return (
     <>
@@ -215,6 +241,8 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         placement='top-center'
+        size='xl'
+        scrollBehavior='outside'
       >
         <ModalContent>
           {onClose => (
@@ -257,6 +285,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
                   selectedList={selected}
                   onTotalChange={handleTotalChange}
                   onProductsChange={handleProductsChange}
+                  onUpdatePrice={handleUpdateProductPrice}
                 />
                 <div className='flex justify-end'>
                   <div>

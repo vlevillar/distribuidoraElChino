@@ -74,19 +74,17 @@ const OrderResume: React.FC<OrderResumeProps> = ({
   return (
     <Table removeWrapper aria-label='Products table'>
       <TableHeader>
-        <TableColumn>Nombre</TableColumn>
-        <TableColumn>
-          Unidades/
-          <br />
+      <TableColumn className='text-center'>Nombre</TableColumn>
+        <TableColumn className='text-center'>
+          Unidades
+        </TableColumn>
+        <TableColumn className='max-w-[80px] text-clip text-center'>
           Peso
-        </TableColumn>
-        <TableColumn className='max-w-[80px] text-clip'>
-          Cantidad
           <br />
-          (Solo Kg)
+          <b>(Solo Kg)</b>
         </TableColumn>
-        <TableColumn>$xKG/U</TableColumn>
-        <TableColumn>Total</TableColumn>
+        <TableColumn className='text-center'>$xKG/U</TableColumn>
+        <TableColumn className='text-center'>Total</TableColumn>
       </TableHeader>
       <TableBody>
         {selectedProducts?.map(product => (
@@ -96,9 +94,8 @@ const OrderResume: React.FC<OrderResumeProps> = ({
               <Input
                 placeholder='0.00'
                 variant='underlined'
-                value={(product.quantity ?? 0).toString()} // Asegurar que sea un string y tenga un valor inicial
                 onValueChange={value =>
-                  handleQuantityChange(product._id, value)
+                  product.measurement === 'unit' ? handleQuantityChange(product._id, value) : handleWeightChange(product._id, value)
                 }
               />
             </TableCell>
@@ -108,7 +105,7 @@ const OrderResume: React.FC<OrderResumeProps> = ({
                 variant='underlined'
                 readOnly={product.measurement === 'unit'}
                 disabled={product.measurement === 'unit'}
-                onValueChange={value => handleWeightChange(product._id, value)}
+                onValueChange={value => handleQuantityChange(product._id, value)}
               />
             </TableCell>
             <TableCell>

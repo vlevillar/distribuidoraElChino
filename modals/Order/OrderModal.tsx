@@ -50,6 +50,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [total, setTotal] = useState(0)
   const [totalWithDiscount, setTotalWithDiscount] = useState(0)
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null)
+  const [showError, setShowError] = useState<boolean>(false);
   const [description, setDescription] = useState('') // Estado para la descripción
   const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1);
 
@@ -170,6 +171,7 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
 
   const handleDateChange = (date: string) => {
     setDeliveryDate(date); 
+    setShowError(false);
   }
 
   const handleCreateOrder = async () => {
@@ -181,6 +183,10 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
     if (!selectedClient || selectedProducts.length === 0) {
       console.error('Client or products not selected')
       return
+    }
+    if (!deliveryDate) {
+      setShowError(true);
+      return;
     }
 
     const transformedProducts = selectedProducts.map(product => ({
@@ -268,7 +274,8 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
                     list={percent}
                     isAdmin={isAdmin}
                   />
-                  <CalendarSelector onDateChange={handleDateChange}/>
+                  <CalendarSelector onDateChange={handleDateChange}         showError={showError}
+        isRequired/>
                 </div>
                 <OrderResume
                   selectedProducts={selectedProducts}

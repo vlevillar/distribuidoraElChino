@@ -20,6 +20,7 @@ interface Order {
   products: Product[]
   discount: string
   selectedList: number
+  date:string
   userId?: string // Añadido para manejar la asignación
   deliveryDate: string
   description: string

@@ -5,9 +5,11 @@ import { Truck } from 'react-feather';
 interface CalendarSelectorProps {
   onDateChange: (date: string) => void;
   initialDate?: string;
+  isRequired?: boolean;
+  showError?: boolean;
 }
 
-function CalendarSelector({ onDateChange, initialDate }: CalendarSelectorProps) {
+function CalendarSelector({ onDateChange, initialDate, isRequired = false, showError }: CalendarSelectorProps) {
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(null);
   const [formattedDate, setFormattedDate] = useState<string>('Seleccionar fecha de entrega');
 
@@ -31,10 +33,14 @@ function CalendarSelector({ onDateChange, initialDate }: CalendarSelectorProps) 
     }
   };
 
+  const buttonStyle = showError ? 'bg-red-500 text-white' : '';
+
   return (
-    <Popover placement='bottom'>
+    <Popover placement="bottom">
       <PopoverTrigger>
-        <Button endContent={<Truck />}>{formattedDate}</Button>
+        <Button endContent={<Truck />} className={buttonStyle}>
+          {formattedDate}
+        </Button>
       </PopoverTrigger>
       <PopoverContent>
         <Calendar value={selectedDate} onChange={handleDateChange} />

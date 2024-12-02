@@ -12,11 +12,12 @@ import { Trash2 } from 'react-feather'
 
 interface Props {
   name: string
+  date: string
   id: string 
   fetchData: () => void
 }
 
-const DelOrderModal: React.FC<Props> = ({ name, id, fetchData }) => {
+const DelOrderModal: React.FC<Props> = ({ name, id, fetchData, date }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const handleDeleteOrder = async () => {
@@ -58,7 +59,7 @@ const DelOrderModal: React.FC<Props> = ({ name, id, fetchData }) => {
             <>
               <ModalHeader className='flex flex-col gap-1'></ModalHeader>
               <ModalBody className='flex items-center justify-center'>
-                ¿Eliminar a {name}?
+                ¿Eliminar pedido de {name}, del dia {date}?
               </ModalBody>
               <ModalFooter className='flex items-center justify-center'>
                 <Button color='danger' onPress={handleDeleteOrder}>

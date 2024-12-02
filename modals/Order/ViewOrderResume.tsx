@@ -26,7 +26,7 @@ interface Product {
 
 interface ViewOrderResumeProps {
   orderData: Product[];
-  selectedList: number; // Agrega selectedList aquí
+  selectedList: number; 
 }
 
 const ViewOrderResume: React.FC<ViewOrderResumeProps> = ({ orderData, selectedList }) => {

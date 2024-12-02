@@ -26,6 +26,7 @@ interface Order {
   clientName: string
   clientId: string
   clientNumber: number
+  date:string
   products: Product[]
   discount: string
   selectedList: number
@@ -80,6 +81,15 @@ export default function OrderAdminItem({
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+  }
+
   const content = (
     <PopoverContent>
       <div className='px-1 py-2'>
@@ -88,6 +98,7 @@ export default function OrderAdminItem({
     </PopoverContent>
   )
 
+  const formattedDate = formatDate(order.date)
 
   const cardContent = (
     <Card className={`max-w-[300px] ${isAssigned ? 'bg-green-800' : ''}`} isPressable={!!selectedUserId} onPress={handleAssignmentChange}>
@@ -112,6 +123,7 @@ export default function OrderAdminItem({
           <CardFooter className='flex items-center justify-center gap-3'>
             <EditOrderModal order={order} onSuccess={fetchData} />
             <DelOrderModal
+            date={formattedDate}
               name={order.clientName}
               id={order._id}
               fetchData={fetchData}

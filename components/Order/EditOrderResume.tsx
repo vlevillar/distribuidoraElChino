@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   Dropdown,
@@ -14,6 +14,7 @@ import {
   TableRow,
   Selection
 } from '@nextui-org/react'
+import EditProductPrice from '@/modals/Order/EditProductPrice'
 
 interface Product {
   _id: string
@@ -22,6 +23,9 @@ interface Product {
   prices: number[]
   quantity: number
   selectedMeasurement?: string
+  basePrices?: number[]
+  measurement?: string
+  units?: number
   selectedPrice?: number
 }
 
@@ -30,89 +34,87 @@ interface EditOrderResumeProps {
   selectedList: number | null
   onProductsChange: (updatedProducts: Product[]) => void
   onTotalChange: (total: number) => void
+  onUpdatePrice: (productId: string, newPrice: number) => void
 }
 
 const EditOrderResume: React.FC<EditOrderResumeProps> = ({
   selectedProducts,
   selectedList,
   onTotalChange,
-  onProductsChange
+  onProductsChange,
+  onUpdatePrice
 }) => {
-  const [selectedKeys, setSelectedKeys] = React.useState<{
-    [key: string]: Selection
-  }>({})
-  const [quantities, setQuantities] = React.useState<{ [key: string]: string }>(
-    {}
-  )
+  const [productStates, setProductStates] = useState<
+    Record<string, { quantity: number; weight: number }>
+  >({})
 
   useEffect(() => {
     const total = selectedProducts.reduce((sum, product) => {
-      const quantity = Number(quantities[product._id] || product.quantity)
-      const price = selectedList !== null ? product.prices[selectedList] : 0
-      return sum + price * quantity
-    }, 0)
-    onTotalChange(total)
-  }, [selectedProducts, quantities, selectedList, onTotalChange])
+      const isByWeight = product.measurement !== 'unit';
+      const amount = isByWeight
+        ? Number(productStates[product._id]?.weight || product.units || 0) // Peso en kg
+        : Number(productStates[product._id]?.quantity || product.quantity); // Unidades
+  
+      const price = selectedList !== null ? product.prices[selectedList] || 0 : 0;
+      return sum + price * amount;
+    }, 0);
+    onTotalChange(total);
+  }, [selectedProducts, productStates, selectedList, onTotalChange]);
+  
 
   useEffect(() => {
-    const mergedArray = selectedProducts.map(product => {
-      const selectedKey = Array.from(
-        selectedKeys[product._id] || new Set(['Kg.'])
-      )[0]
-      const selectedKeyString = String(selectedKey)
-
-      const selectedMeasurement =
-        selectedKeyString === 'Kg.' ? 'kilogram' : 'unit'
-
-      const pxkg = selectedList !== null ? product.prices[selectedList] : 0
-
-      return {
-        ...product,
-        selectedMeasurement,
-        quantity: Number(quantities[product._id] || product.quantity),
-        selectedPrice: pxkg
-      }
-    })
-  }, [selectedProducts, selectedKeys, quantities, selectedList])
-
-  useEffect(() => {
-    const initialQuantities: { [key: string]: string } = {}
-    selectedProducts.forEach(product => {
-      initialQuantities[product._id] = String(product.quantity)
-    })
-    setQuantities(initialQuantities)
+    const initialStates = selectedProducts.reduce(
+      (acc, product) => {
+        acc[product._id] = {
+          quantity: product.quantity,
+          weight: product.units ?? 0
+        }
+        return acc
+      },
+      {} as Record<string, { quantity: number; weight: number }>
+    )
+    setProductStates(initialStates)
   }, [selectedProducts])
 
-  const handleQuantityChange = (id: string, value: string) => {
-    console.log('Changing quantity:', id, value)
+  const handleProductChange = (
+    id: string,
+    key: 'quantity' | 'weight',
+    value: string
+  ) => {
     const numValue = Number(value)
     if (!isNaN(numValue)) {
+      setProductStates(prevStates => ({
+        ...prevStates,
+        [id]: {
+          ...prevStates[id],
+          [key]: numValue
+        }
+      }))
+
       const updatedProducts = selectedProducts.map(product =>
-        product._id === id ? { ...product, quantity: numValue } : product
+        product._id === id
+          ? {
+              ...product,
+              [key === 'quantity' ? 'quantity' : 'units']: numValue
+            }
+          : product
       )
-      setQuantities(prevQuantities => ({ ...prevQuantities, [id]: value })) // Actualiza las cantidades
       onProductsChange(updatedProducts)
     }
-  }
-
-  const handleSelectionChange = (id: string, keys: Selection) => {
-    setSelectedKeys(prev => ({ ...prev, [id]: keys }))
-  }
-
-  const getSelectedValue = (id: string) => {
-    return Array.from(selectedKeys[id] || new Set(['Kg.']))
-      .join(', ')
-      .replaceAll('_', ' ')
   }
 
   return (
     <Table removeWrapper aria-label='Example static collection table'>
       <TableHeader>
-        <TableColumn>Nombre</TableColumn>
-        <TableColumn>Cantidad</TableColumn>
-        <TableColumn>KG/U</TableColumn>
-        <TableColumn>PxKG/U</TableColumn>
-        <TableColumn>Total</TableColumn>
+        <TableColumn className='text-center'>Nombre</TableColumn>
+        <TableColumn className='text-center'>Unidades</TableColumn>
+        <TableColumn className='max-w-[80px] text-clip text-center'>
+          Peso
+          <br />
+          <b>(Solo Kg)</b>
+        </TableColumn>
+        <TableColumn className='text-center'>$xKG/U</TableColumn>
+        <TableColumn className='text-center'>Total</TableColumn>
       </TableHeader>
       <TableBody>
         {selectedProducts?.map(product => (
@@ -122,47 +124,51 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
               <Input
                 placeholder='0.00'
                 variant='underlined'
-                onChange={e =>
-                  handleQuantityChange(product._id, e.target.value)
+                value={String(productStates[product._id]?.quantity ?? 0)}
+                onValueChange={value =>
+                  handleProductChange(product._id, 'quantity', value)
                 }
-                value={String(product.quantity)}
               />
             </TableCell>
             <TableCell>
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button variant='bordered' className='capitalize'>
-                    {getSelectedValue(product._id)}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label='Single selection example'
-                  variant='flat'
-                  disallowEmptySelection
-                  selectionMode='single'
-                  selectedKeys={selectedKeys[product._id] || new Set(['Kg.'])}
-                  onSelectionChange={(keys: Selection) =>
-                    handleSelectionChange(product._id, keys)
+              <Input
+                placeholder={product.measurement === 'unit' ? '-' : '0.00'}
+                variant='underlined'
+                readOnly={product.measurement === 'unit'}
+                disabled={product.measurement === 'unit'}
+                value={String(productStates[product._id]?.weight ?? 0)}
+                onValueChange={value =>
+                  handleProductChange(product._id, 'weight', value)
+                }
+              />
+            </TableCell>
+            <TableCell>
+              {selectedList !== null ? (
+                <EditProductPrice
+                  initialPrice={
+                    product.basePrices && selectedList !== null
+                      ? product.basePrices[selectedList]
+                      : product.prices[selectedList]
                   }
-                >
-                  <DropdownItem key='Kg.'>KG</DropdownItem>
-                  <DropdownItem key='U.'>U.</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+                  onUpdatePrice={newPrice =>
+                    onUpdatePrice(product._id, newPrice)
+                  }
+                />
+              ) : (
+                'N/A'
+              )}
             </TableCell>
             <TableCell>
-              {selectedList !== null
-                ? product.prices[selectedList].toFixed(2)
-                : 'N/A'}
-            </TableCell>
-            <TableCell>
-              {selectedList !== null
-                ? (
-                    product.prices[selectedList] *
-                    Number(quantities[product._id] || product.quantity)
-                  ).toFixed(2)
-                : 'N/A'}
-            </TableCell>
+  {selectedList !== null
+    ? (
+        product.prices[selectedList] *
+        (product.measurement !== 'unit'
+          ? Number(productStates[product._id]?.weight || product.units || 0) // Peso
+          : Number(productStates[product._id]?.quantity || product.quantity) // Unidades
+        )
+      ).toFixed(2)
+    : 'N/A'}
+</TableCell>
           </TableRow>
         ))}
       </TableBody>

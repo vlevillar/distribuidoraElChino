@@ -142,6 +142,7 @@ console.log(order);
             <EditOrderModal order={order} onSuccess={fetchData} />
             <DelOrderModal
               name={order.clientName}
+              date={formatDate(order.date)}
               id={order._id}
               fetchData={fetchData}
             />

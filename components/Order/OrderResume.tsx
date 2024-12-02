@@ -79,7 +79,7 @@ const OrderResume: React.FC<OrderResumeProps> = ({
           Unidades
         </TableColumn>
         <TableColumn className='max-w-[80px] text-clip text-center'>
-          Peso
+          Cantidad
           <br />
           <b>(Solo Kg)</b>
         </TableColumn>

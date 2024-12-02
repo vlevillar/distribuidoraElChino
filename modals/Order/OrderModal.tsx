@@ -50,13 +50,13 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [total, setTotal] = useState(0)
   const [totalWithDiscount, setTotalWithDiscount] = useState(0)
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null)
-  const [showError, setShowError] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false)
   const [description, setDescription] = useState('') // Estado para la descripción
-  const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1);
+  const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1)
 
   useEffect(() => {
     getPricesList()
-    const admin = localStorage.getItem('role') === "admin"
+    const admin = localStorage.getItem('role') === 'admin'
     setIsadmin(admin)
   }, [])
 
@@ -66,14 +66,14 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
 
   const getPricesList = async () => {
     try {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem('accessToken')
       if (!accessToken) {
-        console.error('No se encontró el token de acceso');
-        return;
+        console.error('No se encontró el token de acceso')
+        return
       }
       const response = await fetch(`${process.env.API_URL}/pricesList`, {
         method: 'GET',
-        headers:{'Authorization': `Bearer ${accessToken}`}
+        headers: { Authorization: `Bearer ${accessToken}` }
       })
       if (response.ok) {
         console.log('Datos de precios obtenidos exitosamente')
@@ -92,58 +92,54 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   }
 
   const handleSelectedProductChange = (newProducts: Product[]) => {
-    setSelectedProducts((prevProducts) => {
-      const updatedProducts = newProducts.map((newProduct) => {
-        const existingProduct = prevProducts.find(
-          (p) => p._id === newProduct._id
-        );
+    setSelectedProducts(prevProducts => {
+      const updatedProducts = newProducts.map(newProduct => {
+        const existingProduct = prevProducts.find(p => p._id === newProduct._id)
         return existingProduct
           ? {
               ...newProduct,
               prices: existingProduct.prices,
-              basePrices:
-                existingProduct.basePrices || [...newProduct.prices],
+              basePrices: existingProduct.basePrices || [...newProduct.prices],
               quantity: existingProduct.quantity,
-              units: existingProduct.units,
+              units: existingProduct.units
             }
-          : { ...newProduct, basePrices: [...newProduct.prices] };
-      });
-  
+          : { ...newProduct, basePrices: [...newProduct.prices] }
+      })
+
       // Verifica si los arrays realmente son diferentes
-      if (
-        JSON.stringify(prevProducts) === JSON.stringify(updatedProducts)
-      ) {
-        return prevProducts; // No actualices el estado si no hay cambios
+      if (JSON.stringify(prevProducts) === JSON.stringify(updatedProducts)) {
+        return prevProducts // No actualices el estado si no hay cambios
       }
-  
-      return updatedProducts;
-    });
-  };
-  
-  
+
+      return updatedProducts
+    })
+  }
+
   const handleTotalChange = useCallback((total: number) => {
-    setTotal(total);
-}, []);
+    setTotal(total)
+  }, [])
 
-const handleProductsChange = useCallback((updatedProducts: Product[]) => {
-    setSelectedProducts(updatedProducts);
-}, []);
+  const handleProductsChange = useCallback((updatedProducts: Product[]) => {
+    setSelectedProducts(updatedProducts)
+  }, [])
 
-const handleUpdateProductPrice = useCallback((productId: string, newPrice: number) => {
-    setSelectedProducts((prevProducts) =>
-        prevProducts.map((product) =>
-            product._id === productId
-                ? {
-                      ...product,
-                      prices: product.prices.map((price, index) =>
-                          index === (selected ?? 0) ? newPrice : price
-                      ),
-                  }
-                : product
+  const handleUpdateProductPrice = useCallback(
+    (productId: string, newPrice: number) => {
+      setSelectedProducts(prevProducts =>
+        prevProducts.map(product =>
+          product._id === productId
+            ? {
+                ...product,
+                prices: product.prices.map((price, index) =>
+                  index === (selected ?? 0) ? newPrice : price
+                )
+              }
+            : product
         )
-    );
-}, [selected]);
-
+      )
+    },
+    [selected]
+  )
 
   const handleClose = () => {
     setSelectedClient(null)
@@ -152,7 +148,7 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
     setTotal(0)
     setTotalWithDiscount(0)
     setDeliveryDate(null)
-    setDescription('') 
+    setDescription('')
   }
 
   const handleSelectionChange = useCallback((key: any) => {
@@ -170,23 +166,23 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
   }
 
   const handleDateChange = (date: string) => {
-    setDeliveryDate(date); 
-    setShowError(false);
+    setDeliveryDate(date)
+    setShowError(false)
   }
 
   const handleCreateOrder = async () => {
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem('accessToken')
     if (!accessToken) {
-      console.error('No se encontró el token de acceso');
-      return;
+      console.error('No se encontró el token de acceso')
+      return
     }
     if (!selectedClient || selectedProducts.length === 0) {
       console.error('Client or products not selected')
       return
     }
     if (!deliveryDate) {
-      setShowError(true);
-      return;
+      setShowError(true)
+      return
     }
 
     const transformedProducts = selectedProducts.map(product => ({
@@ -195,8 +191,7 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
       code: String(product.code)
     }))
 
-    console.log(transformedProducts);
-    
+    console.log(transformedProducts)
 
     const orderData = {
       clientId: selectedClient._id,
@@ -216,7 +211,7 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`
         },
         body: JSON.stringify(orderData)
       })
@@ -246,7 +241,7 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
         placement='top-center'
         size='xl'
         scrollBehavior='outside'
->
+      >
         <ModalContent>
           {onClose => (
             <>
@@ -260,22 +255,25 @@ const handleUpdateProductPrice = useCallback((productId: string, newPrice: numbe
                 <SearchOrderProduct
                   onSelectedProductChange={handleSelectedProductChange}
                 />
-                <Input 
-                  label='Descripción' 
-                  placeholder='Ingresar descripción (opcional)' 
-                  endContent={<Info/>} 
+                <Input
+                  label='Descripción'
+                  placeholder='Ingresar descripción (opcional)'
+                  endContent={<Info />}
                   className='py-1'
-                  onChange={e => setDescription(e.target.value)} 
+                  onChange={e => setDescription(e.target.value)}
                 />
-                <div className='flex justify-between z-10'>
+                <div className='z-10 flex justify-between'>
                   <ListSelector
                     handle={handleSelectionChange}
                     selected={selected}
                     list={percent}
                     isAdmin={isAdmin}
                   />
-                  <CalendarSelector onDateChange={handleDateChange}         showError={showError}
-        isRequired/>
+                  <CalendarSelector
+                    onDateChange={handleDateChange}
+                    showError={showError}
+                    isRequired
+                  />
                 </div>
                 <OrderResume
                   selectedProducts={selectedProducts}

@@ -45,14 +45,14 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
   onUpdatePrice
 }) => {
   const [productStates, setProductStates] = useState<
-    Record<string, { quantity: number; weight: number }>
+    Record<string, { quantity: number; units: number }>
   >({})
 
   useEffect(() => {
     const total = selectedProducts.reduce((sum, product) => {
       const isByWeight = product.measurement !== 'unit';
       const amount = isByWeight
-        ? Number(productStates[product._id]?.weight || product.units || 0) // Peso en kg
+        ? Number(productStates[product._id]?.units || product.units || 0) // Peso en kg
         : Number(productStates[product._id]?.quantity || product.quantity); // Unidades
   
       const price = selectedList !== null ? product.prices[selectedList] || 0 : 0;
@@ -67,18 +67,18 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
       (acc, product) => {
         acc[product._id] = {
           quantity: product.quantity,
-          weight: product.units ?? 0
+          units: product.units ?? 0
         }
         return acc
       },
-      {} as Record<string, { quantity: number; weight: number }>
+      {} as Record<string, { quantity: number; units: number }>
     )
     setProductStates(initialStates)
   }, [selectedProducts])
 
   const handleProductChange = (
     id: string,
-    key: 'quantity' | 'weight',
+    key: 'quantity' | 'units',
     value: string
   ) => {
     const numValue = Number(value)
@@ -136,9 +136,9 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
                 variant='underlined'
                 readOnly={product.measurement === 'unit'}
                 disabled={product.measurement === 'unit'}
-                value={String(productStates[product._id]?.weight ?? 0)}
+                value={String(productStates[product._id]?.units ?? 0)}
                 onValueChange={value =>
-                  handleProductChange(product._id, 'weight', value)
+                  handleProductChange(product._id, 'units', value)
                 }
               />
             </TableCell>
@@ -163,7 +163,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
     ? (
         product.prices[selectedList] *
         (product.measurement !== 'unit'
-          ? Number(productStates[product._id]?.weight || product.units || 0) // Peso
+          ? Number(productStates[product._id]?.units || product.units || 0) // Peso
           : Number(productStates[product._id]?.quantity || product.quantity) // Unidades
         )
       ).toFixed(2)

@@ -1,32 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   Input,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow,
-  Selection
+  TableRow
 } from '@nextui-org/react'
 import EditProductPrice from '@/modals/Order/EditProductPrice'
 
 interface Product {
   _id: string
-  code?: string
   name: string
   prices: number[]
-  quantity: number
-  selectedMeasurement?: string
+  quantity: number // Usado para kilogramos o unidades
+  units?: number // Solo relevante para productos por peso (kilogramos)
   basePrices?: number[]
-  measurement?: string
-  units?: number
-  selectedPrice?: number
+  measurement?: string // 'unit' o 'kilogram'
 }
 
 interface EditOrderResumeProps {
@@ -49,32 +40,30 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
   >({})
 
   useEffect(() => {
-    const total = selectedProducts.reduce((sum, product) => {
-      const isByWeight = product.measurement !== 'unit';
-      const amount = isByWeight
-        ? Number(productStates[product._id]?.units || product.units || 0) // Peso en kg
-        : Number(productStates[product._id]?.quantity || product.quantity); // Unidades
-  
-      const price = selectedList !== null ? product.prices[selectedList] || 0 : 0;
-      return sum + price * amount;
-    }, 0);
-    onTotalChange(total);
-  }, [selectedProducts, productStates, selectedList, onTotalChange]);
-  
-
-  useEffect(() => {
     const initialStates = selectedProducts.reduce(
-      (acc, product) => {
-        acc[product._id] = {
+      (acc, product) => ({
+        ...acc,
+        [product._id]: {
           quantity: product.quantity,
-          units: product.units ?? 0
+          units: product.units || 0
         }
-        return acc
-      },
-      {} as Record<string, { quantity: number; units: number }>
+      }),
+      {}
     )
     setProductStates(initialStates)
   }, [selectedProducts])
+
+  useEffect(() => {
+    const total = selectedProducts.reduce((sum, product) => {
+      const quantity =
+        product.measurement === 'kilogram'
+          ? productStates[product._id]?.quantity || 0
+          : productStates[product._id]?.quantity || 0 // Para productos por unidad
+      const price = selectedList !== null ? product.prices[selectedList] || 0 : 0
+      return sum + price * quantity
+    }, 0)
+    onTotalChange(total)
+  }, [selectedProducts, productStates, selectedList, onTotalChange])
 
   const handleProductChange = (
     id: string,
@@ -82,7 +71,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
     value: string
   ) => {
     const numValue = Number(value)
-    if (!isNaN(numValue)) {
+    if (!isNaN(numValue) && numValue >= 0) {
       setProductStates(prevStates => ({
         ...prevStates,
         [id]: {
@@ -90,13 +79,9 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
           [key]: numValue
         }
       }))
-
       const updatedProducts = selectedProducts.map(product =>
         product._id === id
-          ? {
-              ...product,
-              [key === 'quantity' ? 'quantity' : 'units']: numValue
-            }
+          ? { ...product, [key]: numValue }
           : product
       )
       onProductsChange(updatedProducts)
@@ -104,52 +89,56 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
   }
 
   return (
-    <Table removeWrapper aria-label='Example static collection table'>
+    <Table removeWrapper aria-label="Order Resume Table">
       <TableHeader>
-        <TableColumn className='text-center'>Nombre</TableColumn>
-        <TableColumn className='text-center'>Unidades</TableColumn>
-        <TableColumn className='max-w-[80px] text-clip text-center'>
-          Peso
-          <br />
-          <b>(Solo Kg)</b>
+        <TableColumn className="text-center">Nombre</TableColumn>
+        <TableColumn className="text-center">Cantidad</TableColumn>
+        <TableColumn className="max-w-[80px] text-clip text-center">
+          Peso (Kg)
         </TableColumn>
-        <TableColumn className='text-center'>$xKG/U</TableColumn>
-        <TableColumn className='text-center'>Total</TableColumn>
+        <TableColumn className="text-center">$xKG/U</TableColumn>
+        <TableColumn className="text-center">Total</TableColumn>
       </TableHeader>
       <TableBody>
-        {selectedProducts?.map(product => (
+        {selectedProducts.map(product => (
           <TableRow key={product._id}>
             <TableCell>{product.name}</TableCell>
             <TableCell>
               <Input
-                placeholder='0.00'
-                variant='underlined'
-                value={String(productStates[product._id]?.quantity ?? 0)}
+                placeholder="0"
+                variant="underlined"
+                value={String(
+                  product.measurement === 'kilogram'
+                    ? productStates[product._id]?.units || product.units || 0
+                    : productStates[product._id]?.quantity || product.quantity
+                )}
                 onValueChange={value =>
-                  handleProductChange(product._id, 'quantity', value)
+                  handleProductChange(
+                    product._id,
+                    product.measurement === 'kilogram' ? 'units' : 'quantity',
+                    value
+                  )
                 }
               />
             </TableCell>
             <TableCell>
-              <Input
-                placeholder={product.measurement === 'unit' ? '-' : '0.00'}
-                variant='underlined'
-                readOnly={product.measurement === 'unit'}
-                disabled={product.measurement === 'unit'}
-                value={String(productStates[product._id]?.units ?? 0)}
-                onValueChange={value =>
-                  handleProductChange(product._id, 'units', value)
-                }
-              />
+              {product.measurement === 'kilogram' && (
+                <Input
+                  placeholder="0.00"
+                  variant="underlined"
+                  value={String(
+                    productStates[product._id]?.quantity || product.quantity
+                  )}
+                  onValueChange={value =>
+                    handleProductChange(product._id, 'quantity', value)
+                  }
+                />
+              )}
             </TableCell>
             <TableCell>
               {selectedList !== null ? (
                 <EditProductPrice
-                  initialPrice={
-                    product.basePrices && selectedList !== null
-                      ? product.basePrices[selectedList]
-                      : product.prices[selectedList]
-                  }
+                  initialPrice={product.prices[selectedList]}
                   onUpdatePrice={newPrice =>
                     onUpdatePrice(product._id, newPrice)
                   }
@@ -159,16 +148,15 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
               )}
             </TableCell>
             <TableCell>
-  {selectedList !== null
-    ? (
-        product.prices[selectedList] *
-        (product.measurement !== 'unit'
-          ? Number(productStates[product._id]?.units || product.units || 0) // Peso
-          : Number(productStates[product._id]?.quantity || product.quantity) // Unidades
-        )
-      ).toFixed(2)
-    : 'N/A'}
-</TableCell>
+              {selectedList !== null
+                ? (
+                    (product.prices[selectedList] || 0) *
+                    (product.measurement === 'kilogram'
+                      ? productStates[product._id]?.quantity || 0
+                      : productStates[product._id]?.quantity || 0)
+                  ).toFixed(2)
+                : 'N/A'}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

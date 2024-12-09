@@ -139,7 +139,9 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ order, onSuccess }) => 
     setSelectedProducts(prevProducts => {
       return products.map(newProduct => {
         const existingProduct = prevProducts.find(p => p._id === newProduct._id);
-        return existingProduct ? { ...newProduct, quantity: existingProduct.quantity } : { ...newProduct, quantity: 1 };
+        return existingProduct
+          ? { ...newProduct, quantity: existingProduct.quantity, units: existingProduct.units }
+          : { ...newProduct, quantity: newProduct.quantity ?? 0, units: newProduct.units ?? 0 }; // Evitar valores por defecto incorrectos
       });
     });
   }, []);
@@ -185,14 +187,9 @@ const handleUpdateOrder = async () => {
   }
 
   const transformedProducts = selectedProducts.map(product => {
-    const isByWeight = product.measurement !== 'unit';
-    const amount = isByWeight
-      ? product.units ?? 0 // Usa `weight` si es por peso
-      : product.quantity;   // Usa `quantity` si es por unidad
-
     return {
       ...product,
-      total: product.prices[selected ?? 0] * amount, // Calcula el total correctamente
+      total: product.prices[selected ?? 0] * product.quantity, // Calcula el total correctamente
       code: String(product.code), // Asegúrate de transformar el código en string si es necesario
     };
   });

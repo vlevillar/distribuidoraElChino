@@ -65,7 +65,7 @@ export default function SearchOrderProduct({ onSelectedProductChange, initialPro
         return prevSelectedProducts.filter(product => product._id !== productId);
       } else {
         const selectedProduct = products.find(product => product._id === productId);
-        return selectedProduct ? [...prevSelectedProducts, { ...selectedProduct, quantity: 1 }] : prevSelectedProducts;
+        return selectedProduct ? [...prevSelectedProducts, { ...selectedProduct }] : prevSelectedProducts;
       }
     });
   }, [products]);

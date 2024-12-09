@@ -17,7 +17,7 @@ interface Order {
     name: string
     prices: number[]
     quantity: number
-    units:number
+    units?:number
     measurement: string
   }[]
   discount: string

@@ -32,7 +32,7 @@ interface Order {
   products: {
     _id: string
     name: string
-    units: number
+    units?: number
     prices: number[]
     quantity: number
     measurement: string

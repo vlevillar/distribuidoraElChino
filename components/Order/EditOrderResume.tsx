@@ -57,7 +57,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
     const total = selectedProducts.reduce((sum, product) => {
       const quantity =
         product.measurement === 'kilogram'
-          ? productStates[product._id]?.quantity || 0
+          ? productStates[product._id]?.units || 0
           : productStates[product._id]?.quantity || 0 // Para productos por unidad
       const price = selectedList !== null ? product.prices[selectedList] || 0 : 0
       return sum + price * quantity
@@ -109,7 +109,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
                 variant="underlined"
                 value={String(
                   product.measurement === 'kilogram'
-                    ? productStates[product._id]?.units || product.units || 0
+                    ? productStates[product._id]?.quantity || product.quantity || 0
                     : productStates[product._id]?.quantity || product.quantity
                 )}
                 onValueChange={value =>
@@ -127,7 +127,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
                   placeholder="0.00"
                   variant="underlined"
                   value={String(
-                    productStates[product._id]?.quantity || product.quantity
+                    productStates[product._id]?.units || product.units
                   )}
                   onValueChange={value =>
                     handleProductChange(product._id, 'quantity', value)
@@ -152,7 +152,7 @@ const EditOrderResume: React.FC<EditOrderResumeProps> = ({
                 ? (
                     (product.prices[selectedList] || 0) *
                     (product.measurement === 'kilogram'
-                      ? productStates[product._id]?.quantity || 0
+                      ? productStates[product._id]?.units || 0
                       : productStates[product._id]?.quantity || 0)
                   ).toFixed(2)
                 : 'N/A'}

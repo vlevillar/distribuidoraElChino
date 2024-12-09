@@ -74,14 +74,10 @@ const OrderResume: React.FC<OrderResumeProps> = ({
   return (
     <Table removeWrapper aria-label='Products table'>
       <TableHeader>
-      <TableColumn className='text-center'>Nombre</TableColumn>
-        <TableColumn className='text-center'>
-          Unidades
-        </TableColumn>
+        <TableColumn className='text-center'>Nombre</TableColumn>
+        <TableColumn className='text-center'>Cantidad</TableColumn>
         <TableColumn className='max-w-[80px] text-clip text-center'>
-          Cantidad
-          <br />
-          <b>(Solo Kg)</b>
+          Peso (Kg)
         </TableColumn>
         <TableColumn className='text-center'>$xKG/U</TableColumn>
         <TableColumn className='text-center'>Total</TableColumn>
@@ -95,18 +91,22 @@ const OrderResume: React.FC<OrderResumeProps> = ({
                 placeholder='0.00'
                 variant='underlined'
                 onValueChange={value =>
-                  product.measurement === 'unit' ? handleQuantityChange(product._id, value) : handleWeightChange(product._id, value)
+                  product.measurement === 'unit'
+                    ? handleQuantityChange(product._id, value)
+                    : handleWeightChange(product._id, value)
                 }
               />
             </TableCell>
             <TableCell>
+            {product.measurement === 'kilogram' && ( 
               <Input
-                placeholder={product.measurement === 'unit' ? '-' : '0.00'}
+                placeholder='0.00'
                 variant='underlined'
-                readOnly={product.measurement === 'unit'}
-                disabled={product.measurement === 'unit'}
-                onValueChange={value => handleQuantityChange(product._id, value)}
+                onValueChange={value =>
+                  handleQuantityChange(product._id, value)
+                }
               />
+            )}
             </TableCell>
             <TableCell>
               {selectedList !== null ? (

@@ -60,17 +60,11 @@ export default function OrderItem({
 }: OrderItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
     const selectedPrice = product.prices[order.selectedList];
-  
-    // Determinar cantidad basada en el tipo de medición
-    const amount =
-      product.measurement === 'unit' ? product.quantity : (product.units ?? product.quantity);
-  
+
     // Sumar el total para este producto
-    return total + selectedPrice * amount;
+    return total + selectedPrice * product.quantity;
   }, 0);
   
-console.log(order);
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('es-ES', {

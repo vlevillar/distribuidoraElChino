@@ -10,7 +10,7 @@ import {
   Checkbox,
   Input,
 } from '@nextui-org/react'
-import { PlusCircle, DollarSign, Edit } from 'react-feather'
+import { PlusCircle, DollarSign, Edit, Info } from 'react-feather'
 
 export default function ProductModal( { onProductCreated } : { onProductCreated: () => void})  {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -19,6 +19,7 @@ export default function ProductModal( { onProductCreated } : { onProductCreated:
   const [isKilogramChecked, setIsKilogramChecked] = useState(false)
   const [isUnitChecked, setIsUnitChecked] = useState(false)
   const [price, setPrice] = useState('')
+  const [estimate, setEstimate] = useState('')
 
   const determineMeasurement = () => {
     if (isKilogramChecked) {
@@ -54,7 +55,8 @@ export default function ProductModal( { onProductCreated } : { onProductCreated:
             name: name,
             code: code,
             measurement: determineMeasurement(),
-            price: parseFloat(price)
+            price: parseFloat(price),
+            estimate: estimate ? estimate : 0,
           })
         }
       )
@@ -123,6 +125,17 @@ export default function ProductModal( { onProductCreated } : { onProductCreated:
               endContent={<DollarSign />}
               onChange={e => setPrice(e.target.value)}
             />
+            {isKilogramChecked ? 
+            <Input
+              label='Estimado por unidad (kg)'
+              placeholder='0.00'
+              type='number'
+              variant='bordered'
+              endContent={<Info />}
+              onChange={e => setEstimate(e.target.value)}
+            />
+            :
+            null}
           </ModalBody>
           <ModalFooter>
             <Button color='danger' variant='flat' onClick={onClose}>

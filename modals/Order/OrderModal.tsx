@@ -34,6 +34,8 @@ interface Product {
   units?: number
   selectedPrice?: number
   basePrices?: number[]
+  measurement?: string // <-- Para saber si es 'kilogram'
+  estimate?: number // <-- Campo para el peso aproximado de cada unidad
 }
 
 interface OrderModalProps {
@@ -51,7 +53,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [totalWithDiscount, setTotalWithDiscount] = useState(0)
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null)
   const [showError, setShowError] = useState<boolean>(false)
-  const [description, setDescription] = useState('') // Estado para la descripción
+  const [description, setDescription] = useState('')
   const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1)
 
   useEffect(() => {
@@ -60,10 +62,14 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     setIsadmin(admin)
   }, [])
 
+  // Recalcula total con descuento cada vez que cambie 'total' o 'discount'
   useEffect(() => {
     calculateTotalWithDiscount()
   }, [total, discount])
 
+  // ==============================
+  // 1) Cargar lista de precios
+  // ==============================
   const getPricesList = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken')
@@ -87,10 +93,16 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     }
   }
 
+  // ==============================
+  // 2) Manejo de cliente
+  // ==============================
   const handleSelectedClientChange = (clients: Client[]) => {
     setSelectedClient(clients.length > 0 ? clients[0] : null)
   }
 
+  // ==============================
+  // 3) Manejo de productos (selección)
+  // ==============================
   const handleSelectedProductChange = (newProducts: Product[]) => {
     setSelectedProducts(prevProducts => {
       const updatedProducts = newProducts.map(newProduct => {
@@ -101,28 +113,39 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
               prices: existingProduct.prices,
               basePrices: existingProduct.basePrices || [...newProduct.prices],
               quantity: existingProduct.quantity,
-              units: existingProduct.units
+              units: existingProduct.units,
+              measurement:
+                existingProduct.measurement ?? newProduct.measurement,
+              estimate: existingProduct.estimate ?? newProduct.estimate
             }
           : { ...newProduct, basePrices: [...newProduct.prices] }
       })
 
-      // Verifica si los arrays realmente son diferentes
+      // Verifica si hay cambios reales
       if (JSON.stringify(prevProducts) === JSON.stringify(updatedProducts)) {
-        return prevProducts // No actualices el estado si no hay cambios
+        return prevProducts
       }
-
       return updatedProducts
     })
   }
 
-  const handleTotalChange = useCallback((total: number) => {
-    setTotal(total)
+  // ==============================
+  // 4) Calcular total (OrderResume avisa con onTotalChange)
+  // ==============================
+  const handleTotalChange = useCallback((newTotal: number) => {
+    setTotal(newTotal)
   }, [])
 
+  // ==============================
+  // 5) Manejar cambios en productos (cantidad, etc.)
+  // ==============================
   const handleProductsChange = useCallback((updatedProducts: Product[]) => {
     setSelectedProducts(updatedProducts)
   }, [])
 
+  // ==============================
+  // 6) Actualizar precio individual de un producto
+  // ==============================
   const handleUpdateProductPrice = useCallback(
     (productId: string, newPrice: number) => {
       setSelectedProducts(prevProducts =>
@@ -141,6 +164,9 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     [selected]
   )
 
+  // ==============================
+  // 7) Cerrar modal y limpiar
+  // ==============================
   const handleClose = () => {
     setSelectedClient(null)
     setSelectedProducts([])
@@ -151,10 +177,16 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     setDescription('')
   }
 
+  // ==============================
+  // 8) Manejo de la lista de precios seleccionada
+  // ==============================
   const handleSelectionChange = useCallback((key: any) => {
     setSelected(key)
   }, [])
 
+  // ==============================
+  // 9) Recalcular total con descuento
+  // ==============================
   const calculateTotalWithDiscount = () => {
     const discountValue = parseFloat(discount)
     if (!isNaN(discountValue)) {
@@ -165,11 +197,17 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     }
   }
 
+  // ==============================
+  // 10) Manejo de la fecha
+  // ==============================
   const handleDateChange = (date: string) => {
     setDeliveryDate(date)
     setShowError(false)
   }
 
+  // ==============================
+  // 11) Crear orden
+  // ==============================
   const handleCreateOrder = async () => {
     const accessToken = localStorage.getItem('accessToken')
     if (!accessToken) {
@@ -190,7 +228,6 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       quantity: product.quantity,
       code: String(product.code)
     }))
-
     console.log(transformedProducts)
 
     const orderData = {
@@ -229,11 +266,38 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
     }
   }
 
+  // ==============================
+  // 12) Calcular "aproximado" para productos 'kilogram'
+  //     => quantity * estimate * price
+  // ==============================
+  const calculateApproximate = useCallback(() => {
+    if (!selectedProducts.length) return 0
+
+    return selectedProducts.reduce((acc, product) => {
+      // Solo aplica a 'kilogram'
+      if (product.measurement === 'kilogram') {
+        const price = product.prices[selected ?? 0] ?? 0
+        const qty = product.units || 0
+        // El "estimate" que llega desde backend (peso aproximado de cada unidad)
+        // O 0 si no viene
+        const estimateVal = product.estimate ?? 0
+        // Multiplicamos
+        return acc + qty * estimateVal * price
+      }
+      // Si es unit, lo ignoramos en el "aproximado"
+      return acc
+    }, 0)
+  }, [selectedProducts, selected])
+
+  // Obtenemos ese aproximado
+  const approximateTotal = calculateApproximate()
+
   return (
     <>
       <Button onPress={onOpen} color='success' startContent={<PlusCircle />}>
         Agregar pedido
       </Button>
+
       <Modal
         isOpen={isOpen}
         onClose={handleClose}
@@ -275,6 +339,11 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                     isRequired
                   />
                 </div>
+                {/* 
+                  NOTE: OrderResume ya maneja "onTotalChange"
+                  para actualizar 'total' cada vez que cambian
+                  'selectedProducts' o 'selectedList'
+                */}
                 <OrderResume
                   selectedProducts={selectedProducts}
                   selectedList={selected}
@@ -282,6 +351,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                   onProductsChange={handleProductsChange}
                   onUpdatePrice={handleUpdateProductPrice}
                 />
+                {/* 2) Subtotal, descuento, total */}
                 <div className='flex justify-end'>
                   <div>
                     <Input
@@ -292,6 +362,9 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                       onChange={e => setDiscount(e.target.value)}
                       endContent={<Percent />}
                     />
+                      <p>
+                        Aprox: $ {approximateTotal.toFixed(2)}
+                      </p>
                     <p>Subtotal: $ {total.toFixed(2)}</p>
                     {discount ? <p>Descuento: {discount}%</p> : null}
                     <p>

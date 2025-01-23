@@ -10,7 +10,7 @@ import {
   Checkbox,
   Input,
 } from '@nextui-org/react';
-import { Edit, DollarSign } from 'react-feather';
+import { Edit, DollarSign, Info } from 'react-feather';
 
 interface Product {
   _id: string;
@@ -18,6 +18,7 @@ interface Product {
   price: string;
   measurement: string;
   code: string;
+  estimate?: string; // o number, depende de tu backend
 }
 
 interface EditProductProps {
@@ -33,16 +34,21 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
   const [isKilogramChecked, setIsKilogramChecked] = useState(false);
   const [isUnitChecked, setIsUnitChecked] = useState(false);
   const [code, setCode] = useState(product.code);
-  
+  // Nueva propiedad "estimate"
+  const [estimate, setEstimate] = useState(product.estimate ?? '');
+
   useEffect(() => {
     setName(product.name);
     setPrice(product.price);
     setMeasurement(product.measurement);
     setCode(product.code);
-    if (measurement === 'kilogram') {
+    setEstimate(product.estimate ?? '');
+
+    // Actualiza checkboxes segun measurement
+    if (product.measurement === 'kilogram') {
       setIsKilogramChecked(true);
       setIsUnitChecked(false);
-    } else if (measurement === 'unit') {
+    } else if (product.measurement === 'unit') {
       setIsKilogramChecked(false);
       setIsUnitChecked(true);
     } else {
@@ -58,26 +64,23 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
         console.error('No se encontró el token de acceso');
         return;
       }
-      const response = await fetch(
-        `${process.env.API_URL}/products/${product._id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            name: name,
-            price: parseFloat(price),
-            measurement: isKilogramChecked ? 'kilogram' : 'unit', 
-            code: code,
-          }),
-        }
-      );
+      const response = await fetch(`${process.env.API_URL}/products/${product._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          name,
+          price: parseFloat(price),
+          measurement: isKilogramChecked ? 'kilogram' : 'unit',
+          code,
+          // Envías estimate como número si es kilogram, 0 si es unit
+          estimate: isKilogramChecked ? parseFloat(estimate) : 0,
+        }),
+      });
       if (response.ok) {
         console.log('Producto actualizado exitosamente');
-        const updatedMeasurement = isKilogramChecked ? 'kilogram' : 'unit';
-        setMeasurement(updatedMeasurement);
         fetchData();
         onClose();
       } else {
@@ -137,6 +140,18 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
                 Unidad
               </Checkbox>
             </div>
+            {/* Mostramos "estimado" si es kilogram */}
+            {isKilogramChecked && (
+              <Input
+                label="Estimado por unidad (kg)"
+                placeholder="0.00"
+                type="number"
+                variant="bordered"
+                endContent={<Info />}
+                value={estimate}
+                onChange={(e) => setEstimate(e.target.value)}
+              />
+            )}
             <Input
               label="Código"
               placeholder="Código del producto"

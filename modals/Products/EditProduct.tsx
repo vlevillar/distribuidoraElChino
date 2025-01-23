@@ -18,7 +18,7 @@ interface Product {
   price: string;
   measurement: string;
   code: string;
-  estimate?: string; // o number, depende de tu backend
+  estimate?: number; // o number, depende de tu backend
 }
 
 interface EditProductProps {
@@ -36,10 +36,11 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
   const [code, setCode] = useState(product.code);
   // Nueva propiedad "estimate"
   const [estimate, setEstimate] = useState(product.estimate ?? '');
-
+  console.log(product);
+  
   useEffect(() => {
     setName(product.name);
-    setPrice(product.price);
+    setPrice(parseFloat(product.price).toFixed(2));
     setMeasurement(product.measurement);
     setCode(product.code);
     setEstimate(product.estimate ?? '');
@@ -75,8 +76,7 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
           price: parseFloat(price),
           measurement: isKilogramChecked ? 'kilogram' : 'unit',
           code,
-          // Envías estimate como número si es kilogram, 0 si es unit
-          estimate: isKilogramChecked ? parseFloat(estimate) : 0,
+          estimate: isKilogramChecked ? estimate : 0,
         }),
       });
       if (response.ok) {
@@ -148,7 +148,7 @@ const EditProduct: React.FC<EditProductProps> = ({ product, fetchData }) => {
                 type="number"
                 variant="bordered"
                 endContent={<Info />}
-                value={estimate}
+                value={estimate.toString()}
                 onChange={(e) => setEstimate(e.target.value)}
               />
             )}

@@ -5,6 +5,7 @@ import { Card, CardBody, CardFooter, CardHeader, Divider } from '@nextui-org/rea
 interface ProductItemProps {
     id: string;
     price: string;
+    estimate?: number;
     name: string;
     fetchData?: () => void;
     isAdmin?: boolean;
@@ -12,8 +13,9 @@ interface ProductItemProps {
     measurement: string;
 }
   
-export default function ProductItem( { price, name, id, code, measurement, fetchData, isAdmin }: ProductItemProps ) {
-    const product = { _id: id, name, price, code, measurement }
+export default function ProductItem( { price, name, estimate, id, code, measurement, fetchData, isAdmin }: ProductItemProps ) {
+    const product = { _id: id, name, price, code, measurement, estimate }
+    console.log("precio: "+price);
     
     return (
         <Card className="max-w-[300px]">
@@ -26,7 +28,7 @@ export default function ProductItem( { price, name, id, code, measurement, fetch
             <>
             <Divider />
                 <CardBody className='flex items-center'>
-                    <p>${price}</p>
+                    <p>${parseFloat(price).toFixed(2)}</p>
                 </CardBody>
             {isAdmin ? 
             <> 

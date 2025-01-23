@@ -128,6 +128,7 @@ const Productos = () => {
             key={index}
             price={getPrice(product, selected ?? 0)}
             name={product.name}
+            estimate={product.estimate}
             id={product._id}
             fetchData={getProducts}
             isAdmin={isAdmin}

@@ -24,7 +24,12 @@ export default function Admin() {
     userOrders,
     setUserProducts,
     userProducts,
-    setUsers
+    setUsers,
+    page,
+    setPage,
+    totalPages,
+    searchTerm,
+    setSearchTerm
   } = useAdminData()
 
   const handleOrderAssignmentChange = (
@@ -62,22 +67,22 @@ export default function Admin() {
   }
 
   const fetchData = async () => {
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem('accessToken')
     try {
       const response = await fetch(`${process.env.API_URL}/user`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        throw new Error('Failed to fetch users')
       }
-      const data = await response.json();
-      setUsers(data);
+      const data = await response.json()
+      setUsers(data)
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users:', error)
     }
-  };
+  }
 
   const selectedUser = users.find(user => user._id === selectedUserId)
 
@@ -94,6 +99,11 @@ export default function Admin() {
     orders: (
       <AddOrder
         orders={orders}
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
         selectedUserId={selectedUserId}
         userOrders={userOrders}
         onOrderAssignmentChange={handleOrderAssignmentChange}
@@ -113,11 +123,17 @@ export default function Admin() {
     <div className='flex-col items-center justify-center gap-2 text-center'>
       <AdminTabs selected={selected} setSelected={setSelected} />
       <SelectUser users={users} onUserSelect={setSelectedUserId} />
-      <div className='flex gap-2 items-center text-center justify-center mt-2'>
-      <p className='text-sm text-gray-500 mt-1'>
-        {selectedUser ? `Nombre de usuario: ${selectedUser.username}` : 'No se ha seleccionado un usuario'}
-      </p>
-      <DelUserModal name={selectedUser?.name} id={selectedUser?._id} fetchData={fetchData}/>
+      <div className='mt-2 flex items-center justify-center gap-2 text-center'>
+        <p className='mt-1 text-sm text-gray-500'>
+          {selectedUser
+            ? `Nombre de usuario: ${selectedUser.username}`
+            : 'No se ha seleccionado un usuario'}
+        </p>
+        <DelUserModal
+          name={selectedUser?.name}
+          id={selectedUser?._id}
+          fetchData={fetchData}
+        />
       </div>
       <div className='mt-2 flex items-center justify-center'>
         {tabComponents[selected]}

@@ -18,6 +18,10 @@ const useAdminData = () => {
   const [orders, setOrders] = useState([]);
   const [selected, setSelected] = useState('clients');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {

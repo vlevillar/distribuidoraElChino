@@ -26,7 +26,7 @@ interface Order {
   clientName: string
   clientId: string
   clientNumber: number
-  date:string
+  date: string
   products: Product[]
   discount: string
   selectedList: number
@@ -42,12 +42,12 @@ interface OrderAdminItemProps {
   onAssignmentChange: (orderId: string, isAssigned: boolean) => void
 }
 
-export default function OrderAdminItem({ 
-  order, 
-  fetchData, 
+export default function OrderAdminItem({
+  order,
+  fetchData,
   isAssigned,
   selectedUserId,
-  onAssignmentChange 
+  onAssignmentChange
 }: OrderAdminItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
     const selectedPrice = product.prices[order.selectedList]
@@ -66,8 +66,8 @@ export default function OrderAdminItem({
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
+            Authorization: `Bearer ${accessToken}`
+          }
         })
 
         if (!response.ok) {
@@ -76,7 +76,7 @@ export default function OrderAdminItem({
 
         onAssignmentChange(order._id, !isAssigned)
       } catch (error) {
-        console.error("Error assigning/unassigning order:", error)
+        console.error('Error assigning/unassigning order:', error)
       }
     }
   }
@@ -93,7 +93,9 @@ export default function OrderAdminItem({
   const content = (
     <PopoverContent>
       <div className='px-1 py-2'>
-        <div className='text-small font-bold'>Seleccione un usuario para aplicar pedido</div>
+        <div className='text-small font-bold'>
+          Seleccione un usuario para aplicar pedido
+        </div>
       </div>
     </PopoverContent>
   )
@@ -101,7 +103,11 @@ export default function OrderAdminItem({
   const formattedDate = formatDate(order.date)
 
   const cardContent = (
-    <Card className={`max-w-[300px] ${isAssigned ? 'bg-green-800' : ''}`} isPressable={!!selectedUserId} onPress={handleAssignmentChange}>
+    <Card
+      className={`w-[300px] ${isAssigned ? 'bg-green-800' : ''}`}
+      isPressable={!!selectedUserId}
+      onPress={handleAssignmentChange}
+    >
       <CardHeader className='flex items-center justify-center gap-3'>
         <div className='flex flex-col'>
           <p className='text-md'>{order.clientName}</p>
@@ -123,7 +129,7 @@ export default function OrderAdminItem({
           <CardFooter className='flex items-center justify-center gap-3'>
             <EditOrderModal order={order} onSuccess={fetchData} />
             <DelOrderModal
-            date={formattedDate}
+              date={formattedDate}
               name={order.clientName}
               id={order._id}
               fetchData={fetchData}

@@ -37,8 +37,6 @@ const Pedidos = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('creation')
   const [dateRange, setDateRange] = useState<RangeValue<DateValue>>()
-  console.log(searchTerm)
-
   const [isAdmin, setIsAdmin] = useState(false)
   const [page, setPage] = useState(1)
   const [limit] = useState(15)
@@ -57,13 +55,13 @@ const Pedidos = () => {
   // reset de página al buscar
   useEffect(() => {
     setPage(1)
-  }, [searchTerm])
+  }, [searchTerm, dateRange])
 
-  // dispara la carga cada vez que cambie page, isAdmin o searchTerm
+  // dispara la carga cada vez que cambie page, isAdmin, searchTerm, dateRange o selectedFilter
   useEffect(() => {
     const endpoint = isAdmin ? 'orders/all' : 'orders'
     loadOrders(page, endpoint, searchTerm)
-  }, [page, isAdmin, searchTerm])
+  }, [page, isAdmin, searchTerm, dateRange, selectedFilter])
 
   const loadOrders = async (
     pageNumber = 1,
@@ -73,10 +71,20 @@ const Pedidos = () => {
     const token = localStorage.getItem('accessToken')
     if (!token) return
 
-    const url =
+    let url =
       `${process.env.API_URL}/${endpoint}` +
       `?page=${pageNumber}&limit=${limit}` +
       (search ? `&search=${encodeURIComponent(search)}` : '')
+
+    if (dateRange?.start) {
+      url += `&startDate=${dateRange.start.year}-${dateRange.start.month.toString().padStart(2, '0')}-${dateRange.start.day.toString().padStart(2, '0')}`
+    }
+
+    if (dateRange?.end) {
+      url += `&endDate=${dateRange.end.year}-${dateRange.end.month.toString().padStart(2, '0')}-${dateRange.end.day.toString().padStart(2, '0')}`
+    }
+
+    url += `&dateField=${selectedFilter}`
 
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` }
@@ -84,7 +92,6 @@ const Pedidos = () => {
     if (!res.ok) throw new Error('Error al obtener las órdenes')
 
     const json = await res.json()
-    console.log('API raw:', json)
 
     let data: Order[] = []
     let tp = 1
@@ -98,38 +105,6 @@ const Pedidos = () => {
     setOrders(data)
     setTotalPages(tp)
   }
-
-  // filtro local (búsqueda + fechas)
-  const filteredOrders = (orders ?? []).filter(order => {
-    const matchesSearch = order.clientName
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-
-    const orderDate = new Date(
-      selectedFilter === 'creation'
-        ? order.date
-        : order.deliveryDate?.split('/').reverse().join('-')
-    )
-
-    const startDate = dateRange?.start
-      ? new Date(
-          dateRange.start.year,
-          dateRange.start.month - 1,
-          dateRange.start.day
-        )
-      : null
-
-    const endDate = dateRange?.end
-      ? new Date(dateRange.end.year, dateRange.end.month - 1, dateRange.end.day)
-      : null
-
-    const matchesDateRange =
-      startDate && endDate
-        ? orderDate >= startDate && orderDate <= endDate
-        : true
-
-    return matchesSearch && matchesDateRange
-  })
 
   return (
     <div className='flex flex-col items-center py-4'>
@@ -155,7 +130,7 @@ const Pedidos = () => {
 
       {/* Lista de órdenes */}
       <div className='xs:grid-cols-1 grid w-full gap-4 sm:grid-cols-3 md:grid-cols-5'>
-        {filteredOrders.map(order => (
+        {orders.map(order => (
           <OrderItem
             key={order._id}
             order={order}

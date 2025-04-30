@@ -38,14 +38,13 @@ interface Order {
     measurement: string
   }[]
   discount: string
-  date: string 
+  date: string
   deliveryDate: string
   documentNumber: number
   type: string
   selectedList: number
   description: string
 }
-
 
 interface OrderItemProps {
   order: Order
@@ -59,12 +58,12 @@ export default function OrderItem({
   isAdmin
 }: OrderItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
-    const selectedPrice = product.prices[order.selectedList];
+    const selectedPrice = product.prices[order.selectedList]
 
     // Sumar el total para este producto
-    return total + selectedPrice * product.quantity;
-  }, 0);
-  
+    return total + selectedPrice * product.quantity
+  }, 0)
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('es-ES', {
@@ -82,7 +81,7 @@ export default function OrderItem({
           {order.description ? (
             <Popover placement='bottom'>
               <PopoverTrigger className='cursor-pointer'>
-                <Info color='grey' size='20px' />
+                <Info color='red' size='20px' />
               </PopoverTrigger>
               <PopoverContent>
                 <div className='px-1 py-2'>

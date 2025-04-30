@@ -302,6 +302,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
         isOpen={isOpen}
         onClose={handleClose}
         onOpenChange={onOpenChange}
+        isDismissable={false}
         placement='top-center'
         size='xl'
         scrollBehavior='outside'
@@ -362,9 +363,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                       onChange={e => setDiscount(e.target.value)}
                       endContent={<Percent />}
                     />
-                      <p>
-                        Aprox: $ {approximateTotal.toFixed(2)}
-                      </p>
+                    <p>Aprox: $ {approximateTotal.toFixed(2)}</p>
                     <p>Subtotal: $ {total.toFixed(2)}</p>
                     {discount ? <p>Descuento: {discount}%</p> : null}
                     <p>

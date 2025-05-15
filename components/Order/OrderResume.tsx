@@ -62,10 +62,12 @@ const OrderResume: React.FC<OrderResumeProps> = ({
       onProductsChange(updatedProducts)
     }
   }
+  console.log(selectedProducts)
 
   const calculateTotal = () => {
     const total = selectedProducts.reduce((sum, product) => {
-      const price = product.prices[selectedList ?? 0]
+      const priceIndex = (selectedList ?? 1) - 1
+      const price = product.prices[priceIndex]
       return sum + price * product.quantity
     }, 0)
     onTotalChange(total)
@@ -98,15 +100,15 @@ const OrderResume: React.FC<OrderResumeProps> = ({
               />
             </TableCell>
             <TableCell>
-            {product.measurement === 'kilogram' && ( 
-              <Input
-                placeholder='0.00'
-                variant='underlined'
-                onValueChange={value =>
-                  handleQuantityChange(product._id, value)
-                }
-              />
-            )}
+              {product.measurement === 'kilogram' && (
+                <Input
+                  placeholder='0.00'
+                  variant='underlined'
+                  onValueChange={value =>
+                    handleQuantityChange(product._id, value)
+                  }
+                />
+              )}
             </TableCell>
             <TableCell>
               {selectedList !== null ? (

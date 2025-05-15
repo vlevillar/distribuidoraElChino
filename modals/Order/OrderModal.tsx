@@ -92,6 +92,8 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       console.error('Error al obtener datos de precios:', error)
     }
   }
+  console.log(selected)
+  console.log(percent)
 
   // ==============================
   // 2) Manejo de cliente

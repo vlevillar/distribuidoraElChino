@@ -1,5 +1,11 @@
 import React from 'react'
-import { Card, CardBody, CardFooter, CardHeader, Divider } from '@nextui-org/react'
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Divider
+} from '@nextui-org/react'
 import DelProductModal from '@/modals/Products/DeleteProductModal'
 import EditProduct from '@/modals/Products/EditProduct'
 
@@ -28,44 +34,21 @@ export default function ProductAdminItem({
   selectedUserId,
   onAssignmentChange
 }: ProductItemProps) {
-  const product = { _id: id, name, price, measurement, code}
+  const product = { _id: id, name, price, measurement, code }
 
-  const handleAssignmentChange = async () => {
-    if (selectedUserId) {
-      const accessToken = localStorage.getItem('accessToken')
-      try {
-        const endpoint = isAssigned
-          ? `${process.env.API_URL}/products/unassign/${id}/${selectedUserId}`
-          : `${process.env.API_URL}/products/assign/${id}/${selectedUserId}`
-
-        const response = await fetch(endpoint, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        onAssignmentChange(id, !isAssigned)
-      } catch (error) {
-        console.error("Error assigning/unassigning product:", error)
-      }
-    }
+  const handleAssignmentChange = () => {
+    onAssignmentChange(id, isAssigned)
   }
 
   return (
-    <Card 
-      className={`max-w-[300px] ${isAssigned ? 'bg-green-800' : ''}`} 
+    <Card
+      className={`max-w-[300px] ${isAssigned ? 'bg-green-800' : ''}`}
       isPressable={!!selectedUserId}
       onPress={handleAssignmentChange}
     >
-      <CardHeader className="flex gap-3 items-center justify-center">
-        <div className="flex flex-col">
-          <p className="text-md">{name}</p>
+      <CardHeader className='flex items-center justify-center gap-3'>
+        <div className='flex flex-col'>
+          <p className='text-md'>{name}</p>
         </div>
       </CardHeader>
       {fetchData ? (
@@ -77,10 +60,8 @@ export default function ProductAdminItem({
             </CardBody>
           )}
           <Divider />
-          <CardFooter className='flex gap-3 justify-center items-center'>
-            {isAdmin && (
-              <EditProduct product={product} fetchData={fetchData} />
-            )}
+          <CardFooter className='flex items-center justify-center gap-3'>
+            {isAdmin && <EditProduct product={product} fetchData={fetchData} />}
             <DelProductModal name={name} id={id} fetchData={fetchData} />
           </CardFooter>
         </>

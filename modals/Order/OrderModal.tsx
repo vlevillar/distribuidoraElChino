@@ -14,6 +14,7 @@ import SearchOrderClient from '@/components/Order/SearchOrderClient'
 import SearchOrderProduct from '@/components/Order/SearchOrderProduct'
 import OrderResume from '@/components/Order/OrderResume'
 import ListSelector from '@/components/Percent/ListSelector'
+import { getPriceIndexFromSelected } from '@/utils/getPriceIndex'
 import CalendarSelector from '@/components/Order/CalendarSelector'
 
 interface Client {
@@ -54,12 +55,15 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null)
   const [showError, setShowError] = useState<boolean>(false)
   const [description, setDescription] = useState('')
-  const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1)
+  const [selected, setSelected] = useState<number>(0)
 
   useEffect(() => {
     getPricesList()
     const admin = localStorage.getItem('role') === 'admin'
     setIsadmin(admin)
+    if (admin) {
+      setSelected(0) // o null si querés forzar que el admin seleccione
+    }
   }, [])
 
   // Recalcula total con descuento cada vez que cambie 'total' o 'discount'
@@ -92,8 +96,8 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
       console.error('Error al obtener datos de precios:', error)
     }
   }
-  console.log(selected)
-  console.log(percent)
+  console.log('selected LIST: ', selected)
+  console.log('LIST: ', percent)
 
   // ==============================
   // 2) Manejo de cliente
@@ -150,21 +154,23 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   // ==============================
   const handleUpdateProductPrice = useCallback(
     (productId: string, newPrice: number) => {
+      const priceIndex = getPriceIndexFromSelected(selected, percent)
       setSelectedProducts(prevProducts =>
         prevProducts.map(product =>
           product._id === productId
             ? {
                 ...product,
                 prices: product.prices.map((price, index) =>
-                  index === (selected ?? 0) ? newPrice : price
+                  index === priceIndex ? newPrice : price
                 )
               }
             : product
         )
       )
     },
-    [selected]
+    [selected, percent]
   )
+  
 
   // ==============================
   // 7) Cerrar modal y limpiar
@@ -274,22 +280,19 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   // ==============================
   const calculateApproximate = useCallback(() => {
     if (!selectedProducts.length) return 0
-
+    const priceIndex = getPriceIndexFromSelected(selected, percent)
+  
     return selectedProducts.reduce((acc, product) => {
-      // Solo aplica a 'kilogram'
       if (product.measurement === 'kilogram') {
-        const price = product.prices[selected ?? 0] ?? 0
+        const price = product.prices[priceIndex] ?? 0
         const qty = product.units || 0
-        // El "estimate" que llega desde backend (peso aproximado de cada unidad)
-        // O 0 si no viene
         const estimateVal = product.estimate ?? 0
-        // Multiplicamos
         return acc + qty * estimateVal * price
       }
-      // Si es unit, lo ignoramos en el "aproximado"
       return acc
     }, 0)
-  }, [selectedProducts, selected])
+  }, [selectedProducts, selected, percent])
+  
 
   // Obtenemos ese aproximado
   const approximateTotal = calculateApproximate()
@@ -349,6 +352,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
                 */}
                 <OrderResume
                   selectedProducts={selectedProducts}
+                  percent={percent}
                   selectedList={selected}
                   onTotalChange={handleTotalChange}
                   onProductsChange={handleProductsChange}

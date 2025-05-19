@@ -9,6 +9,7 @@ import {
   TableRow
 } from '@nextui-org/react'
 import EditProductPrice from '@/modals/Order/EditProductPrice'
+import { getPriceIndexFromSelected } from '@/utils/getPriceIndex'
 
 interface Product {
   _id: string
@@ -26,6 +27,7 @@ interface OrderResumeProps {
   selectedProducts: Product[]
   selectedList: number | null
   onTotalChange: (total: number) => void
+  percent: { number: number }[]
   onProductsChange: (updatedProducts: Product[]) => void
   onUpdatePrice: (productId: string, newPrice: number) => void
 }
@@ -33,16 +35,24 @@ interface OrderResumeProps {
 const OrderResume: React.FC<OrderResumeProps> = ({
   selectedProducts,
   selectedList,
+  percent,
   onTotalChange,
   onProductsChange,
   onUpdatePrice
 }) => {
+  const priceIndex = getPriceIndexFromSelected(selectedList, percent)
+  
   useEffect(() => {
-    calculateTotal()
-  }, [selectedProducts, selectedList])
+    const priceIndex = getPriceIndexFromSelected(selectedList, percent)
+    const total = selectedProducts.reduce((sum, product) => {
+      const price = product.prices[priceIndex] ?? 0
+      return sum + price * product.quantity
+    }, 0)
+    onTotalChange(total)
+  }, [selectedProducts, selectedList, percent])
+  
 
   const handleQuantityChange = (id: string, value: string) => {
-    console.log('Changing quantity:', id, value)
     const numValue = Number(value)
     if (!isNaN(numValue)) {
       const updatedProducts = selectedProducts.map(product =>
@@ -53,7 +63,6 @@ const OrderResume: React.FC<OrderResumeProps> = ({
   }
 
   const handleWeightChange = (id: string, value: string) => {
-    console.log('Changing Weight:', id, value)
     const numValue = Number(value)
     if (!isNaN(numValue)) {
       const updatedProducts = selectedProducts.map(product =>
@@ -62,30 +71,31 @@ const OrderResume: React.FC<OrderResumeProps> = ({
       onProductsChange(updatedProducts)
     }
   }
-  console.log(selectedProducts)
 
-  const calculateTotal = () => {
-    const total = selectedProducts.reduce((sum, product) => {
-      const priceIndex = (selectedList ?? 1) - 1
-      const price = product.prices[priceIndex]
-      return sum + price * product.quantity
-    }, 0)
-    onTotalChange(total)
-  }
+console.log("SELECTEDPRODUCTS: ", selectedProducts);
+console.log("selectedList:", selectedList)
+console.log("percent:", percent.map(p => p.number))
+console.log("priceIndex calculado:", getPriceIndexFromSelected(selectedList, percent))
 
-  return (
-    <Table removeWrapper aria-label='Products table'>
-      <TableHeader>
-        <TableColumn className='text-center'>Nombre</TableColumn>
-        <TableColumn className='text-center'>Cantidad</TableColumn>
-        <TableColumn className='max-w-[80px] text-clip text-center'>
-          Peso (Kg)
-        </TableColumn>
-        <TableColumn className='text-center'>$xKG/U</TableColumn>
-        <TableColumn className='text-center'>Total</TableColumn>
-      </TableHeader>
-      <TableBody>
-        {selectedProducts?.map(product => (
+
+return (
+  <Table removeWrapper aria-label='Products table'>
+    <TableHeader>
+      <TableColumn className='text-center'>Nombre</TableColumn>
+      <TableColumn className='text-center'>Cantidad</TableColumn>
+      <TableColumn className='max-w-[80px] text-clip text-center'>
+        Peso (Kg)
+      </TableColumn>
+      <TableColumn className='text-center'>$xKG/U</TableColumn>
+      <TableColumn className='text-center'>Total</TableColumn>
+    </TableHeader>
+    <TableBody>
+      {selectedProducts?.map(product => {
+          const priceIndex = getPriceIndexFromSelected(selectedList, percent)
+          const price = product.prices[priceIndex] ?? 0
+          const basePrice = product.basePrices?.[priceIndex] ?? price
+
+        return (
           <TableRow key={product._id}>
             <TableCell>{product.name}</TableCell>
             <TableCell>
@@ -111,31 +121,23 @@ const OrderResume: React.FC<OrderResumeProps> = ({
               )}
             </TableCell>
             <TableCell>
-              {selectedList !== null ? (
-                <EditProductPrice
-                  initialPrice={
-                    product.basePrices && selectedList !== null
-                      ? product.basePrices[selectedList] // Precio base como número
-                      : product.prices[selectedList]
-                  }
-                  onUpdatePrice={newPrice =>
-                    onUpdatePrice(product._id, newPrice)
-                  }
-                />
-              ) : (
-                'N/A'
-              )}
+            <EditProductPrice
+          initialPrice={basePrice}
+          onUpdatePrice={newPrice =>
+            onUpdatePrice(product._id, newPrice)
+          }
+        />
             </TableCell>
             <TableCell>
-              {selectedList !== null
-                ? (product.prices[selectedList] * product.quantity).toFixed(2)
-                : 'N/A'}
+              {(price * product.quantity).toFixed(2)}
             </TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
+        )
+      })}
+    </TableBody>
+  </Table>
+)
 }
+
 
 export default React.memo(OrderResume)

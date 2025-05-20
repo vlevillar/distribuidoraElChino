@@ -47,19 +47,42 @@ export default function Admin() {
     })
   }
 
-  const handleProductAssignmentChange = (
+  const handleProductAssignmentChange = async (
     productId: string,
-    isAssigned: boolean
+    isCurrentlyAssigned: boolean
   ) => {
     setUserProducts(prev => {
       const newSet = new Set(prev)
-      if (isAssigned) {
+      if (!isCurrentlyAssigned) {
         newSet.add(productId)
       } else {
         newSet.delete(productId)
       }
       return newSet
     })
+
+    if (!selectedUserId) return
+
+    const accessToken = localStorage.getItem('accessToken')
+    const endpoint = isCurrentlyAssigned
+      ? `${process.env.API_URL}/products/unassign/${productId}/${selectedUserId}`
+      : `${process.env.API_URL}/products/assign/${productId}/${selectedUserId}`
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al asignar/desasignar producto')
+      }
+    } catch (error) {
+      console.error('Error en el fetch de asignación:', error)
+    }
   }
 
   const handleUserClientsChange = (newUserClients: Set<string>) => {

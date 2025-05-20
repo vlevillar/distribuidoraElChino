@@ -54,7 +54,7 @@ export default function OrderModal({ onSuccess }: OrderModalProps) {
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null)
   const [showError, setShowError] = useState<boolean>(false)
   const [description, setDescription] = useState('')
-  const [selected, setSelected] = useState<number | null>(isAdmin ? null : 1)
+  const [selected, setSelected] = useState<number | null>(null)
 
   useEffect(() => {
     getPricesList()

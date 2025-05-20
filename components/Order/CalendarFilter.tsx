@@ -49,7 +49,7 @@ const CalendarFilter: React.FC<CalendarFilterProps> = ({
   return (
     <Popover placement='bottom'>
       <PopoverTrigger>
-        <Button endContent={<Calendar />}>Filtrar por fecha</Button>
+        <Button>Filtrar por fecha</Button>
       </PopoverTrigger>
       <PopoverContent>
         <RangeCalendar

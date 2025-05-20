@@ -91,7 +91,6 @@ const RouteModal: React.FC<Props> = ({ currentDate, onAddRoute }) => {
     setSelectedClients(clients)
   }
 
-  console.log(selectedClients);
   
 
   return (

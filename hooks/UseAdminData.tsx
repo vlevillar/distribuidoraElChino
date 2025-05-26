@@ -184,7 +184,7 @@ const useAdminData = () => {
       }
       const data = await response.json()
       setUserProducts(
-        new Set(data.map((product: { id: string }) => product.id))
+        new Set(data.map((product: { _id: string }) => product._id))
       )
     } catch (error) {
       console.error('Error fetching products by user ID:', error)

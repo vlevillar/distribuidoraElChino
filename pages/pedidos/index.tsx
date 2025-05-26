@@ -110,7 +110,13 @@ const Pedidos = () => {
     <div className='flex flex-col items-center py-4'>
       {/* Modal para crear */}
       <div className='pb-4'>
-        <OrderModal onSuccess={() => loadOrders(page)} />
+        <OrderModal
+          onSuccess={() => {
+            setSearchTerm('') // Limpia el filtro de búsqueda
+            setDateRange(undefined) // (opcional, si querés resetear filtros de fecha también)
+            setPage(1) // Vuelve a la primera página
+          }}
+        />
       </div>
 
       {/* Filtros y búsqueda */}
@@ -134,8 +140,9 @@ const Pedidos = () => {
           <OrderItem
             key={order._id}
             order={order}
-            fetchData={() => loadOrders(page)}
+            fetchData={loadOrders}
             isAdmin={isAdmin}
+            setPage={setPage}
           />
         ))}
       </div>

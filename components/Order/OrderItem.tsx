@@ -50,12 +50,14 @@ interface OrderItemProps {
   order: Order
   fetchData?: () => void
   isAdmin?: boolean
+  setPage: React.Dispatch<React.SetStateAction<number>>
 }
 
 export default function OrderItem({
   order,
   fetchData,
-  isAdmin
+  isAdmin,
+  setPage
 }: OrderItemProps) {
   const totalPrice = order.products.reduce((total, product) => {
     const selectedPrice = product.prices[order.selectedList]
@@ -138,6 +140,7 @@ export default function OrderItem({
               date={formatDate(order.date)}
               id={order._id}
               fetchData={fetchData}
+              setPage={setPage}
             />
           </CardFooter>
         </>

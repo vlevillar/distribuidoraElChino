@@ -15,7 +15,7 @@ interface Props {
   date: string
   id: string
   fetchData: () => void
-  setPage: React.Dispatch<React.SetStateAction<number>>
+  setPage?: React.Dispatch<React.SetStateAction<number>>
 }
 
 const DelOrderModal: React.FC<Props> = ({
@@ -45,7 +45,6 @@ const DelOrderModal: React.FC<Props> = ({
         console.log('Orden eliminada exitosamente')
         onClose()
         if (setPage) setPage(1)
-        setPage(1)
       } else {
         console.error('Error al eliminar la orden')
       }

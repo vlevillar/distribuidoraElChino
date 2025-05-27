@@ -35,7 +35,11 @@ const useAdminData = () => {
   const [clients, setClients] = useState([])
   const [userOrders, setUserOrders] = useState<Set<string>>(new Set())
   const [userClients, setUserClients] = useState<Set<string>>(new Set())
+  const [userProductsMap, setUserProductsMap] = useState<
+    Map<string, Set<string>>
+  >(new Map())
   const [userProducts, setUserProducts] = useState<Set<string>>(new Set())
+
   const [products, setProducts] = useState([])
   const [orders, setOrders] = useState<Order[]>([])
   const [selected, setSelected] = useState('clients')
@@ -81,7 +85,14 @@ const useAdminData = () => {
     if (selectedUserId) {
       fetchClientsByUserId(selectedUserId)
       fetchOrdersByUserId(selectedUserId)
-      fetchProductsByUserId(selectedUserId)
+
+      if (!userProductsMap.has(selectedUserId)) {
+        fetchProductsByUserId(selectedUserId)
+      } else {
+        const cached = userProductsMap.get(selectedUserId) || new Set()
+        setUserProducts(cached)
+        console.log('✅ Recuperado de cache:', selectedUserId, cached)
+      }
     } else if (selectedUserId === null) {
       fetchClientsByUserId('null')
       fetchOrdersByUserId('null')
@@ -179,13 +190,18 @@ const useAdminData = () => {
           }
         }
       )
-      if (!response.ok) {
-        throw new Error('Failed to fetch products')
-      }
+      if (!response.ok) throw new Error('Failed to fetch products')
       const data = await response.json()
-      setUserProducts(
-        new Set(data.map((product: { _id: string }) => product._id))
+      const newSet: Set<string> = new Set<string>(
+        (data as { _id: string }[]).map(product => product._id)
       )
+
+      setUserProductsMap(prev => {
+        const updated = new Map(prev)
+        updated.set(userId, newSet)
+        return updated
+      })
+      setUserProducts(newSet)
     } catch (error) {
       console.error('Error fetching products by user ID:', error)
       setUserProducts(new Set())
@@ -198,6 +214,7 @@ const useAdminData = () => {
     userClients,
     userOrders,
     userProducts,
+    userProductsMap,
     products,
     orders,
     page,
@@ -213,6 +230,7 @@ const useAdminData = () => {
     setUserClients,
     setUserOrders,
     setUserProducts,
+    setUserProductsMap,
     setSelectedUserId
   }
 }

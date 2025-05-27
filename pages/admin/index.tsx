@@ -24,6 +24,7 @@ export default function Admin() {
     userOrders,
     setUserProducts,
     userProducts,
+    setUserProductsMap,
     setUsers,
     page,
     setPage,
@@ -53,11 +54,17 @@ export default function Admin() {
   ) => {
     setUserProducts(prev => {
       const newSet = new Set(prev)
-      if (!isCurrentlyAssigned) {
-        newSet.add(productId)
-      } else {
-        newSet.delete(productId)
-      }
+      if (!isCurrentlyAssigned) newSet.add(productId)
+      else newSet.delete(productId)
+
+      setUserProductsMap(prevMap => {
+        const updated = new Map(prevMap)
+        if (selectedUserId) {
+          updated.set(selectedUserId, newSet)
+        }
+        return updated
+      })
+
       return newSet
     })
 
